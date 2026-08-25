@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Window background for all screens. The inherited RimDroid green-star watermark was removed:
+     it conflicts with the Prison Architect blue/orange identity. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/md_theme_background" />
+</layer-list>

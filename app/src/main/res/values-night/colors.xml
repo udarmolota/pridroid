@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- DARK mode: Prison Architect orange over the header's deep blueprint blues. -->
+    <color name="rd_primary">#F69F35</color>
+    <color name="rd_primary_dark">#F49022</color>
+    <color name="rd_on_primary">#191D22</color>
+    <color name="rd_primary_container">#4F3028</color>
+    <color name="rd_on_primary_container">#F2F2E6</color>
+    <color name="rd_secondary">#009EC3</color>
+
+    <!-- Material 3 dark scheme — exact blue families sampled from header.jpg. -->
+    <color name="md_theme_secondary">#009EC3</color>
+    <color name="md_theme_onSecondary">#00273E</color>
+    <color name="md_theme_secondaryContainer">#00486C</color>
+    <color name="md_theme_onSecondaryContainer">#F2F2E6</color>
+    <color name="md_theme_tertiary">#5BA4AF</color>
+    <color name="md_theme_onTertiary">#00273E</color>
+    <color name="md_theme_tertiaryContainer">#025176</color>
+    <color name="md_theme_onTertiaryContainer">#F2F2E6</color>
+    <color name="md_theme_error">#FFB4AB</color>
+    <color name="md_theme_onError">#690005</color>
+    <color name="md_theme_errorContainer">#93000A</color>
+    <color name="md_theme_onErrorContainer">#FFDAD6</color>
+    <color name="md_theme_background">#00273E</color>
+    <color name="md_theme_onBackground">#F2F2E6</color>
+    <color name="md_theme_surface">#032E49</color>
+    <color name="md_theme_onSurface">#F2F2E6</color>
+    <color name="md_theme_surfaceVariant">#00486C</color>
+    <color name="md_theme_onSurfaceVariant">#CBEAF3</color>
+    <color name="md_theme_outline">#009EC3</color>
+    <color name="md_theme_outlineVariant">#025176</color>
+    <color name="md_theme_inverseSurface">#F2F2E6</color>
+    <color name="md_theme_inverseOnSurface">#032E49</color>
+    <color name="md_theme_inversePrimary">#F49022</color>
+    <color name="md_theme_surfaceDim">#00273E</color>
+    <color name="md_theme_surfaceBright">#006992</color>
+    <color name="md_theme_surfaceContainerLowest">#00273E</color>
+    <color name="md_theme_surfaceContainerLow">#032E49</color>
+    <color name="md_theme_surfaceContainer">#00486C</color>
+    <color name="md_theme_surfaceContainerHigh">#025176</color>
+    <color name="md_theme_surfaceContainerHighest">#00557B</color>
+</resources>

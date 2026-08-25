@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PriDroid</string>
+    <string name="loading_title">Starting Prison Architect</string>
+    <string name="loading_runtime">Preparing the Linux runtime…</string>
+    <string name="loading_graphics">Starting graphics…</string>
+    <string name="loading_game_data">Loading game data (main.dat)…</string>
+    <string name="loading_sounds">Loading sounds…</string>
+    <string name="loading_interface">Preparing the interface…</string>
+    <string name="loading_world">Preparing the prison…</string>
+    <string name="loading_elapsed">Elapsed %1$s · the first launch can take longer</string>
+    <string name="loading_slow">Still loading — large game archives take time on Android…</string>
+    <string name="loading_failed">The game stopped before its first frame. Press Back to return.</string>
+    <string name="launch">Launch</string>
+    <string name="stop">Stop</string>
+    <string name="install_instance">Install Instance (ZIP)…</string>
+    <string name="no_instances">No instances installed</string>
+    <string name="choose_instance_prompt">— Choose an instance —</string>
+    <string name="choose_instance_first">Choose an instance to install into</string>
+    <string name="incomplete_game_title">Incomplete game files</string>
+    <string name="incomplete_game_msg">This instance can\'t start — these game files are missing or incomplete:\n\n%1$s\n\nThis usually means a download didn\'t finish. Download the game again using the SAME instance name and it will continue where it stopped.</string>
+    <string name="delete_instance">Delete instance</string>
+    <string name="more_options">More options</string>
+    <string name="delete_instance_confirm">Delete instance \"%1$s\" and all its files? This cannot be undone.</string>
+    <string name="log">Log</string>
+    <string name="renderer">Renderer</string>
+    <string name="renderer_info">PriDroid currently renders Prison Architect through Zink ZFA.</string>
+    <string name="vulkan_driver">Vulkan driver</string>
+    <string name="vulkan_driver_hint">Pick the driver that matches your GPU — non-Snapdragon devices should choose the System driver. If not works try another one.</string>
+    <string name="driver_recommend">Recommended driver (detect GPU)</string>
+    <string name="upload_custom_driver">Upload your custom driver</string>
+    <string name="drag_pan_label">Drag an empty area to pan the camera</string>
+    <string name="reverse_landscape_label">Mirror the picture (180°)</string>
+    <string name="nav_cloud_saves">Steam Cloud saves</string>
+    <string name="cloud_saves_title">Steam Cloud saves</string>
+    <string name="cloud_saves_hint">If you also play RimWorld on a PC through Steam, your saves are synced to Steam Cloud — this pulls them onto the phone.\n\nSigning in is confirmed through the Steam Mobile app: you must have signed into it at least once and turned Steam Guard on there. When you tap the button, Steam sends an approval request to that app. The password goes straight to Steam and is never stored here.</string>
+    <string name="cloud_saves_user">Steam username</string>
+    <string name="cloud_saves_pass">Steam password</string>
+    <string name="cloud_saves_instance">Copy the saves into</string>
+    <string name="cloud_saves_pull">Get saves from Steam Cloud</string>
+    <string name="cloud_saves_push">Send saves to Steam Cloud</string>
+    <string name="cloud_saves_pull_note">Everything in your cloud is downloaded first, then copied into this instance. If a save of the same name is already here, you get to choose which one to keep.</string>
+    <string name="cloud_saves_push_note">Saves the cloud does not have yet are sent straight away. Anything that would replace a save already up there is listed first, so you can decide. Close the game before sending.</string>
+    <string name="cloud_saves_log_connecting">Connecting to Steam…</string>
+    <string name="cloud_saves_log_placed">Copied in: %1$s</string>
+    <string name="cloud_saves_log_kept">Kept the copy on this phone: %1$s</string>
+    <string name="cloud_saves_place_done">Done: %1$d copied in, %2$d left as they were.</string>
+    <string name="cloud_saves_clash_title">%1$s is already here</string>
+    <string name="cloud_saves_clash_msg">On this phone: %1$s
+In the cloud: %2$s
+
+%3$s</string>
+    <string name="cloud_saves_clash_cloud_newer">The cloud copy is newer.</string>
+    <string name="cloud_saves_clash_local_newer">The copy on this phone is newer.</string>
+    <string name="cloud_saves_clash_replace">Use the cloud one</string>
+    <string name="cloud_saves_clash_keep">Keep mine</string>
+    <string name="cloud_saves_clash_both">Keep both</string>
+    <string name="cloud_saves_clash_in_cloud">in the cloud: %1$s</string>
+    <string name="cloud_saves_clash_on_phone">on this phone: %1$s</string>
+    <string name="cloud_saves_from_cloud_suffix">(from cloud)</string>
+    <string name="cloud_saves_push_replace">Replace them</string>
+    <string name="cloud_saves_push_only_new">Only send new ones</string>
+    <string name="cloud_saves_dir_pull">From cloud</string>
+    <string name="cloud_saves_dir_push">To cloud</string>
+    <string name="cloud_saves_keepalive">Syncing saves with Steam — you can switch to Steam Mobile to approve</string>
+    <string name="cloud_saves_push_confirm_title">Send saves to the cloud?</string>
+    <string name="cloud_saves_push_confirm_replace">These already exist in the cloud and will be REPLACED by the phone\'s copy — your PC will load this version instead:\n\n• %1$s\n\nMake sure the game is closed on both devices.</string>
+    <string name="cloud_saves_no_instances">No instances yet</string>
+    <string name="cloud_saves_need_login">Enter your Steam username and password</string>
+    <string name="cloud_saves_code_title">Enter Steam Guard code</string>
+    <string name="cloud_saves_code_wrong">Code incorrect — try again</string>
+    <string name="cloud_saves_code">Steam Guard code</string>
+    <string name="cloud_saves_code_email">Code emailed to %1$s</string>
+    <string name="reverse_landscape_hint">Flips the game to the opposite landscape — still fixed, no free rotation. Turn on if your gamepad or cradle holds the phone the other way up.</string>
+    <string name="compat_mode_label">Compatibility mode</string>
+    <string name="compat_mode_hint">Turn on if the game won\'t start (black screen / stuck on loading). A bit slower, but helps it launch on some devices.</string>
+    <string name="compat_mode_dialog_title">Compatibility mode — please read</string>
+    <string name="compat_mode_dialog_msg">This is a fallback for devices that cannot pass the normal loading screen. It is slower; leave it off when Prison Architect already starts normally.</string>
+    <string name="haptic_label">Vibrate on button press</string>
+    <string name="audio_label">Game sound</string>
+    <string name="show_fps_label">Show render FPS (top-left)</string>
+    <string name="fps_cap_label">Frame rate limit</string>
+    <string name="fps_cap_hint">Limits game rendering so it does not waste CPU and battery submitting more frames than the display can show. 60 is recommended; use 120 on high-refresh flagships.</string>
+    <string name="texq_label">Texture memory</string>
+    <string name="texq_hint">Low-memory uses Prison Architect\'s own safe mode to scale very large desktop images before uploading them to the GPU. It starts faster on weaker phones and uses much less memory, with softer large textures.</string>
+    <string name="texq_no">Original</string>
+    <string name="texq_low">Low (recommended)</string>
+    <string name="texq_ultra">Ultra low</string>
+    <string name="fps_cap_30">30 FPS</string>
+    <string name="fps_cap_60">60 FPS</string>
+    <string name="fps_cap_120">120 FPS</string>
+    <string name="fps_cap_off">No limit</string>
+    <string name="render_res_label">Render resolution</string>
+    <string name="render_res_relative">Fullscreen</string>
+    <string name="render_res_fixed_169">Black margins 1280×720 — fastest</string>
+    <string name="render_res_fullscreen">fullscreen</string>
+    <string name="render_res_black_margins">black margins</string>
+    <string name="render_res_hint" formatted="false">Lower fullscreen resolutions enlarge Prison Architect’s desktop UI and reduce GPU load without adding borders. Try 60% first, or 50% if the interface is still too small. The separate 1280×720 option uses black margins.</string>
+    <string name="driver_recommend_result">GPU: %1$s → %2$s</string>
+    <string name="driver_auto_set_title">Recommended driver set</string>
+    <string name="driver_auto_set">Detected GPU: %1$s.\n\nThe recommended Vulkan driver was set for this instance: %2$s.\n\nIf you get a black screen or artifacts, change it in the instance settings (the gear icon on the instance card).</string>
+    <string name="nav_import_mods">Import Mods (ZIP)…</string>
+    <string name="nav_export_saves">Export saves</string>
+    <string name="nav_import_saves">Import saves</string>
+    <string name="nav_export_settings">Export game settings</string>
+    <string name="nav_import_settings">Import game settings</string>
+    <string name="nav_export_logs">Export logs (ZIP)…</string>
+    <string name="nav_export_layout">Export controls layout…</string>
+    <string name="nav_import_layout">Import controls layout…</string>
+    <string name="nav_updates">New versions (GitHub)</string>
+    <string name="nav_bug_report">Report a bug</string>
+    <!-- Drawer footer icon labels (accessibility) -->
+    <string name="link_x">RimDroid on X</string>
+    <string name="link_reddit">RimDroid on Reddit</string>
+    <string name="link_support">Support the developer</string>
+    <string name="link_soon">Coming soon</string>
+    <!-- Captions shown under each drawer-footer icon. Brand names stay untranslated. -->
+    <string name="nav_label_github" translatable="false">GitHub</string>
+    <string name="nav_label_x" translatable="false">X</string>
+    <string name="nav_label_reddit" translatable="false">Reddit</string>
+    <string name="nav_label_donate">Donate</string>
+    <string name="nav_label_zomdroid" translatable="false">Zomdroid</string>
+    <!-- Cross-promo dialog for the sibling launcher. -->
+    <string name="zomdroid_dialog_message">Zomdroid runs Project Zomboid on Android, just as PriDroid runs Prison Architect. Same author, same approach.\n\nhttps://github.com/udarmolota/Zomdroid/releases</string>
+    <string name="zomdroid_url" translatable="false">https://github.com/udarmolota/Zomdroid/releases</string>
+    <!-- Bug report email. Number = the tap date as ddMMyyyy, filled at runtime. -->
+    <string name="bug_report_email" translatable="false">210478@mail.ru</string>
+    <string name="bug_report_subject">PRIDROID REPORT %1$s</string>
+    <string name="bug_report_body">Hi, I have a new bug report.\n\nDescription: \n\n\n---\n%1$s</string>
+    <string name="bug_report_no_mail">No email app found on this device.</string>
+    <string name="bug_report_ready">Report ready: %1$d KB, %2$d files</string>
+    <string name="bug_report_failed">Could not create the report: %1$s</string>
+    <!-- Support dialog (heart icon). ko-fi link is made clickable at runtime. -->
+    <string name="donate_title">Support development</string>
+    <string name="donate_message">Enjoying PriDroid and want to support it?\n\nMade and maintained by: ko-fi.com/udarmolota\n\nEvery bit helps keep the work going. Thank you! ❤</string>
+    <!-- External links. url_x carries what url_reddit used to. -->
+    <string name="url_github_releases" translatable="false">https://github.com/udarmolota/rimdroid/releases</string>
+    <string name="url_x" translatable="false">https://x.com/rimdroid</string>
+    <string name="url_reddit_sub" translatable="false">https://www.reddit.com/r/rimdroid/</string>
+    <string name="on_screen_controls">On-screen controls</string>
+    <string name="edit_controls">Edit on-screen controls…</string>
+    <string name="editor_bg_set">Background</string>
+    <string name="editor_bg_clear">No BG</string>
+    <string name="editor_add">Add</string>
+    <string name="editor_reset">Reset</string>
+    <string name="editor_done">Done</string>
+    <string name="editor_delete">Delete element</string>
+    <string name="editor_hint">Tap to select • drag to move</string>
+    <string name="editor_reset_confirm">Reset all on-screen controls to the default layout?</string>
+    <string name="nav_launcher">Launcher</string>
+    <string name="nav_settings">Settings</string>
+    <string name="app_settings_theme">Theme</string>
+    <string name="app_settings_note">Game settings (driver, resolution, texture memory, frame rate and controls) are per-instance — open them from a game card\'s gear icon.</string>
+    <string name="theme_system">Follow system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="custom_driver_title">Custom Vulkan driver</string>
+    <string name="custom_driver_note">Import a Vulkan/Turnip driver (a raw .so or an AdrenoTools .zip). Then, in a game card\'s gear → Vulkan driver, pick \"Custom driver (imported)\". The driver is shared by all instances on this device.</string>
+    <string name="custom_driver_import">Import driver (.so / .zip)</string>
+    <string name="custom_driver_remove">Remove</string>
+    <string name="custom_driver_status_none">No custom driver imported.</string>
+    <string name="custom_driver_status_installed">Imported ✓ (%1$s)</string>
+    <string name="custom_driver_importing">Importing driver…</string>
+    <string name="custom_driver_imported">Custom driver imported (%1$s)</string>
+    <string name="custom_driver_import_failed">Import failed: %1$s</string>
+    <string name="custom_driver_removed">Custom driver removed</string>
+    <string name="nav_new_instance">Add game instance</string>
+    <string name="nav_download_game">Steam Downloads</string>
+    <string name="nav_download_mods">Workshop mods</string>
+    <string name="nav_install_content">Install mod / DLC (ZIP)…</string>
+    <string name="nav_custom_driver">Custom Vulkan driver…</string>
+    <string name="install_content_note">Pick a .zip (mod or GOG DLC) from your phone, choose the instance and type, then Install. Prison Architect mods are detected by manifest.txt and installed into the selected instance\'s save-data mods folder.</string>
+    <string name="install_content_instance">Install into instance</string>
+    <string name="install_content_type">Type</string>
+    <string name="install_content_mod">Mod → .Prison Architect/mods/</string>
+    <string name="install_content_dlc">DLC → Data/</string>
+    <string name="install_content_pick">Choose ZIP file…</string>
+    <string name="install_content_no_file">No file selected</string>
+    <string name="install_content_go">Install</string>
+
+    <!-- Download screen -->
+    <string name="download_game_title">Download RimWorld from Steam</string>
+    <string name="download_mods_title">Prison Architect Workshop mods</string>
+    <string name="download_version_note">Downloads the Linux build straight into a new instance — no Termux, no PC.</string>
+    <string name="download_instance_hint">Instance name (e.g. RimWorld 1.5)</string>
+    <string name="download_version_label">Game version</string>
+    <string name="download_version_15">RimWorld 1.5</string>
+    <string name="download_version_16">RimWorld 1.6</string>
+    <string name="download_user_hint">Steam username</string>
+    <string name="download_pass_hint">Steam password</string>
+    <string name="download_login_note">Your login is sent to Steam (the same way DepotDownloader works) and is NOT stored. Approve the sign-in in your Steam Mobile app, or enter the Steam Guard code when asked.</string>
+    <string name="download_manifest_hint">Advanced: Manifest ID — blank = recommended 1.5</string>
+    <string name="download_start">Download</string>
+    <string name="download_tab_game">Game</string>
+    <string name="download_tab_dlc">DLC</string>
+    <string name="download_tab_mods">Mods</string>
+    <string name="download_dlc_note">Pick the DLC your account owns. Each downloads as a portable .zip into /Download/RimDroid — import it into any instance from the menu. (Unowned DLC are skipped.)</string>
+    <string name="download_dlc_start">Download selected DLC</string>
+    <string name="download_install_content">Install a downloaded mod into an instance…</string>
+    <string name="download_mods_note">Download Prison Architect Workshop mods by ID (the number in …/sharedfiles/filedetails/?id=NUMBER). No Steam login or account is needed. Several IDs can be separated by spaces. Each mod is saved as a .zip in /Download/PriDroid.</string>
+    <string name="download_mods_hint">Workshop ID(s) — space-separated</string>
+    <string name="download_mods_hint_single">Workshop ID</string>
+    <string name="download_mods_start">Download mods</string>
+    <string name="download_mods_login_head">Direct download (no login)</string>
+    <string name="download_mods_browser_head">Download via browser (ggntw.com)</string>
+    <string name="download_mods_browser_note">Opens a third-party downloader — download the .zip there, then Install it into an instance. (Third-party service; use at your own discretion.)</string>
+    <string name="download_mods_browser_start">Get download link (browser)</string>
+    <string name="download_cancel">Cancel download</string>
+    <string name="download_cancel_confirm">Cancel the download in progress?</string>
+    <string name="gl4es_label">GL4ES (compatible, older GPUs)</string>
+    <string name="zink_zfa_label">Zink ZFA (Vulkan, recommended)</string>
+    <string name="zink_osmesa_label">Zink OSMesa (Vulkan, fallback)</string>
+    <string name="softpipe_label">Software (slow, any GPU — for Mali/PowerVR)</string>
+    <string name="mobileglues_label">MobileGlues (GL over GLES — experimental, no Vulkan)</string>
+    <string name="debug_mode">Debug mode (verbose log)</string>
+    <string name="strict_barriers">Interpreter mode (test — VERY slow, diagnostic for save corruption)</string>
+    <string name="env_vars_title">Advanced: extra launch variables</string>
+    <string name="env_vars_hint">KEY=VALUE pairs (space-separated), applied on launch and overriding the defaults. For diagnostics tests — leave empty unless you know what you\'re doing. </string>
+    <string name="env_vars_hint_example">e.g. BOX64_DYNAREC_ALIGNED_ATOMICS=1</string>
+
+    <!-- Settings cards -->
+    <string name="card_video">Video</string>
+    <string name="card_fps">Frame rate</string>
+    <string name="card_controls">Controls</string>
+    <string name="card_sound">Sound</string>
+    <string name="card_advanced">Advanced</string>
+    <string name="sound_generate">Install game sound</string>
+    <string name="sound_generate_note">Game sound is installed as a separate mod because of decoder issues. The toggle below turns that mod on or off. With sound on, the game takes a bit longer to load.</string>
+    <string name="sound_installing_title">Installing sound</string>
+    <string name="sound_generate_toast">This may take up to 2 minutes. You can keep using the app.</string>
+    <string name="sound_done">Sound pack ready! Turn on \"Game sound\" in Settings to use it.</string>
+    <string name="sound_failed">Sound pack generation failed. See Download/_fmod_spike_result.txt.</string>
+    <string name="env_section_header">Environment variables</string>
+    <string name="smoketest_label">Test software renderer (OSMesa)</string>
+    <string name="steam_spike_label">Steam login spike (QR)</string>
+    <string name="steam_dl_label">Steam download spike (RimWorld)</string>
+    <string name="pick_zip">Pick ZIP file…</string>
+    <string name="install">Install</string>
+    <string name="installing">Installing…</string>
+    <string name="instance_name_hint">Instance name</string>
+    <string name="selected_zip_hint">No file selected</string>
+    <string name="error_name_required">Name is required</string>
+    <string name="error_name_too_long">Name is too long (max %1$d characters)</string>
+    <string name="error_name_exists">An instance with this name already exists</string>
+    <string name="nav_manage_storage">Manage Storage</string>
+    <string name="clear">Clear</string>
+
+    <!-- Gamepad button remapper -->
+    <string name="gamepad_mapper_settings_btn">Gamepad mapping</string>
+    <string name="gamepad_mapper_title">Gamepad mapping</string>
+    <string name="gamepad_mapper_instructions">Fix a controller with swapped buttons. Tap Start, then press the physical button you want for each action.</string>
+    <string name="gamepad_mapper_start">Start</string>
+    <string name="gamepad_mapper_reset">Reset to default</string>
+    <string name="gamepad_mapper_reset_done">Mapping reset to default</string>
+    <string name="gamepad_mapper_step">Press the button for:\n%1$s</string>
+    <string name="gamepad_mapper_done">Mapping saved</string>
+    <string name="gamepad_mapper_dup">Already assigned — press another button</string>
+    <string-array name="gamepad_mapper_labels">
+        <item>A — F1</item>
+        <item>B — Escape</item>
+        <item>X — F2</item>
+        <item>Y — Q (rotate)</item>
+        <item>LB — Zoom out</item>
+        <item>RB — Zoom in</item>
+        <item>Select — Tab</item>
+        <item>Start — Next colonist (.)</item>
+        <item>L3 — Shift (multi-select)</item>
+        <item>R3 — Right stick press (unused)</item>
+    </string-array>
+</resources>
