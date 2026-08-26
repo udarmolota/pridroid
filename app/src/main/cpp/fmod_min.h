@@ -12,8 +12,8 @@
 // Symbols are resolved at runtime via dlopen/dlsym (see fmod_decode_spike.c), so this
 // header only provides the function-pointer signatures + structs/enums/flags.
 
-#ifndef RIMDROID_FMOD_MIN_H
-#define RIMDROID_FMOD_MIN_H
+#ifndef PRIDROID_FMOD_MIN_H
+#define PRIDROID_FMOD_MIN_H
 
 #include <stdint.h>
 
@@ -108,4 +108,4 @@ typedef FMOD_RESULT (*pfn_Sound_Lock)(FMOD_SOUND *sound, unsigned int offset, un
 typedef FMOD_RESULT (*pfn_Sound_Unlock)(FMOD_SOUND *sound, void *ptr1, void *ptr2, unsigned int len1, unsigned int len2);
 typedef FMOD_RESULT (*pfn_Sound_Release)(FMOD_SOUND *sound);
 
-#endif // RIMDROID_FMOD_MIN_H
+#endif // PRIDROID_FMOD_MIN_H

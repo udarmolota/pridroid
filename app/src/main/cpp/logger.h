@@ -4,15 +4,15 @@
 #include <stdio.h>
 
 #ifndef LOG_TAG
-#define LOG_TAG "rimdroid"
+#define LOG_TAG "pridroid"
 #endif
 
-extern FILE* g_rimdroid_log_file;  // defined in rimdroid.c
+extern FILE* g_pridroid_log_file;  // defined in pridroid.c
 
 #define _LOG_TO_FILE(fmt, ...) do { \
-    if (g_rimdroid_log_file) { \
-        fprintf(g_rimdroid_log_file, fmt "\n", ##__VA_ARGS__); \
-        fflush(g_rimdroid_log_file); \
+    if (g_pridroid_log_file) { \
+        fprintf(g_pridroid_log_file, fmt "\n", ##__VA_ARGS__); \
+        fflush(g_pridroid_log_file); \
     } \
 } while(0)
 

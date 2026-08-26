@@ -1,0 +1,82 @@
+#ifndef PRIDROID_H
+#define PRIDROID_H
+
+#include <stdint.h>
+#include <android/native_window.h>
+
+/* FPS overlay: presented-frame counter, bumped by pridroid_frame_tick() from
+ * box64's SDL_GL_SwapWindow (once per present). The Java overlay polls it. */
+extern volatile uint64_t g_pridroid_frame_count;
+void pridroid_frame_tick(void);
+
+/**
+ * Called from JNI before startGame.
+ * Reads PRIDROID_RENDERER env var, initialises surface state.
+ */
+int pridroid_init();
+
+/**
+ * Called from JNI on activity destroy.
+ */
+void pridroid_deinit();
+
+/**
+ * Main entry point: initialise box64 namespace, load linker hook,
+ * then exec RimWorldLinux ELF via box64.
+ *
+ * @param game_dir_path      absolute path to RimWorld instance dir (cwd)
+ * @param library_dir_path   colon-separated ARM64 native lib search paths
+ * @param argc               count of extra args for RimWorldLinux
+ * @param argv               extra args (usually NULL)
+ */
+void pridroid_start_game(const char* game_dir_path,
+                         const char* library_dir_path,
+                         int argc,
+                         const char** argv);
+
+void pridroid_surface_init(ANativeWindow* wnd, int width, int height);
+void pridroid_surface_deinit();
+
+/**
+ * Software-renderer smoke test (OSMesa + softpipe). Renders a test frame into a CPU
+ * buffer via libOSMesa.so and blits it to the current surface. Proves the CPU GL path
+ * works before the box64 SDL interception is wired. Returns 0 on success.
+ * @param osmesa_lib_path absolute path to libOSMesa.so (in the deps dir)
+ */
+int pridroid_osmesa_smoketest(const char* osmesa_lib_path);
+
+/**
+ * OSMesa (softpipe) PERSISTENT software-renderer path (Milestone 2). Wired into
+ * the game: box64's my2_SDL_GL_* handlers drive these when RD_SOFTPIPE is active.
+ * pridroid_init_osmesa() loads libOSMesa + creates a CORE 3.3 context (call once
+ * at launch). make_current binds the context + CPU buffer to the calling thread;
+ * swap blits the buffer to the surface. The g_osmesa_context / g_osmesa_handle
+ * globals are weak-referenced by box64 (wrappedsdl2.c) to select the softpipe path.
+ */
+int   pridroid_init_osmesa(void);
+int   pridroid_osmesa_make_current(void);
+int   pridroid_osmesa_make_current_ctx(void* ctx);   // bind a specific (per-Unity) OSMesa context
+void* pridroid_osmesa_create_shared(void);           // extra context sharing with the primary
+void  pridroid_osmesa_swap(void);
+
+/* Phase A input injection (defined in pridroid.c). The Android touch handler
+ * pushes mouse events; box64's my2_SDL_PollEvent drains them via rd_input_poll. */
+void rd_input_mouse_motion(int x, int y);
+void rd_input_mouse_button(int button, int down, int x, int y);
+void rd_input_mouse_scroll(int dy);      /* SDL mouse wheel: +up / -down (zoom) */
+void rd_input_key(int scancode, int keycode, int down);  /* SDL key down/up */
+void rd_input_text(const char* utf8);    /* SDL text input (typing) */
+int  rd_input_poll(unsigned char* out);  /* out >= 56 bytes; returns 1 if filled */
+unsigned int rd_input_get_mouse(int* x, int* y);  /* current cursor + SDL button mask */
+
+/**
+ * NO-FORK entry point for the standalone exec'd binary (libpridroid_exec.so).
+ * Runs box64+RimWorld in a fresh process (clean address space, fresh binder) so
+ * the GPU context can be created+used without fork.  See pridroid.c for details.
+ */
+int pridroid_run_standalone(const char* game_dir_path,
+                            const char* library_dir_path,
+                            int argc,
+                            const char** argv);
+
+#endif // PRIDROID_H

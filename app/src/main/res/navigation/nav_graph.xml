@@ -6,42 +6,42 @@
 
     <fragment
         android:id="@+id/launcher_fragment"
-        android:name="com.rimdroid.fragments.LauncherFragment"
+        android:name="com.pridroid.fragments.LauncherFragment"
         android:label="@string/nav_launcher" />
 
     <fragment
         android:id="@+id/settings_fragment"
-        android:name="com.rimdroid.fragments.SettingsFragment"
+        android:name="com.pridroid.fragments.SettingsFragment"
         android:label="@string/nav_settings" />
 
     <fragment
         android:id="@+id/app_settings_fragment"
-        android:name="com.rimdroid.fragments.AppSettingsFragment"
+        android:name="com.pridroid.fragments.AppSettingsFragment"
         android:label="@string/nav_settings" />
 
     <fragment
         android:id="@+id/new_instance_fragment"
-        android:name="com.rimdroid.fragments.NewInstanceFragment"
+        android:name="com.pridroid.fragments.NewInstanceFragment"
         android:label="@string/nav_new_instance" />
 
     <fragment
         android:id="@+id/download_fragment"
-        android:name="com.rimdroid.fragments.DownloadFragment"
+        android:name="com.pridroid.fragments.DownloadFragment"
         android:label="@string/nav_download_mods" />
 
     <fragment
         android:id="@+id/cloud_saves_fragment"
-        android:name="com.rimdroid.fragments.CloudSavesFragment"
+        android:name="com.pridroid.fragments.CloudSavesFragment"
         android:label="@string/nav_cloud_saves" />
 
     <fragment
         android:id="@+id/install_content_fragment"
-        android:name="com.rimdroid.fragments.InstallContentFragment"
+        android:name="com.pridroid.fragments.InstallContentFragment"
         android:label="@string/nav_install_content" />
 
     <fragment
         android:id="@+id/driver_fragment"
-        android:name="com.rimdroid.fragments.DriverImportFragment"
+        android:name="com.pridroid.fragments.DriverImportFragment"
         android:label="@string/nav_custom_driver" />
 
     <action android:id="@+id/action_settings"

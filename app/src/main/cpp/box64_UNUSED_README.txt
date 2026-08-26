@@ -8,9 +8,9 @@ See app/src/main/cpp/CMakeLists.txt:
     set(BOX64_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../box64)   # = <project_root>/box64
     add_subdirectory(${BOX64_ROOT} box64_build)
 
-Both paths are the same fork (github.com/udarmolota/rimdroid-box64), registered twice in
+Both paths are the same fork (github.com/udarmolota/pridroid-box64), registered twice in
 .gitmodules, but only <project_root>/box64 is built. Editing app/src/main/cpp/box64 has NO
 effect on the APK.
 
-(Native sources that ARE built from this directory: rimdroid.c, rimdroid_jni.c, rimdroid.h,
+(Native sources that ARE built from this directory: pridroid.c, pridroid_jni.c, pridroid.h,
 liblinkernsbypass — those are fine to edit here. Only the box64/ subtree is the duplicate.)

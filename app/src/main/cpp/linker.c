@@ -6,10 +6,10 @@
 #include <unistd.h>
 #include "logger.h"
 #include "emulation.h"
-#include "rimdroid_globals.h"
+#include "pridroid_globals.h"
 #include "liblinkernsbypass/android_linker_ns.h"
 
-#define LOG_TAG "rimdroid-linker"
+#define LOG_TAG "pridroid-linker"
 
 static void* (*loader_dlopen)(const char* filename, int flags, const void* caller);
 static void* (*loader_dlsym)(void* handle, const char* symbol, const void* caller);
@@ -21,17 +21,17 @@ static void* vulkan_driver_handle;
 static void* vulkan_loader_handle;
 
 __attribute__((visibility("default"), used))
-void rimdroid_linker_set_vulkan_driver_handle(void* handle) {
+void pridroid_linker_set_vulkan_driver_handle(void* handle) {
     vulkan_driver_handle = handle;
 }
 
 __attribute__((visibility("default"), used))
-void rimdroid_linker_set_vulkan_loader_handle(void* handle) {
+void pridroid_linker_set_vulkan_loader_handle(void* handle) {
     vulkan_loader_handle = handle;
 }
 
 __attribute__((visibility("default"), used))
-void rimdroid_linker_set_proc_addrs(void* _loader_dlopen_fn, void* _loader_dlsym_fn,
+void pridroid_linker_set_proc_addrs(void* _loader_dlopen_fn, void* _loader_dlsym_fn,
                                     void* _loader_android_dlopen_ext_fn) {
     loader_dlopen              = _loader_dlopen_fn;
     loader_dlsym               = _loader_dlsym_fn;
@@ -39,8 +39,8 @@ void rimdroid_linker_set_proc_addrs(void* _loader_dlopen_fn, void* _loader_dlsym
 }
 
 __attribute__((visibility("default"), used))
-int rimdroid_linker_init() {
-    if (rimdroid_emulation_init() != 0) {
+int pridroid_linker_init() {
+    if (pridroid_emulation_init() != 0) {
         LOGE("Failed to initialize emulation");
         return -1;
     }

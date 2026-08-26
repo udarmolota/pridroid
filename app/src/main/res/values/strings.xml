@@ -110,8 +110,8 @@ In the cloud: %2$s
     <string name="nav_updates">New versions (GitHub)</string>
     <string name="nav_bug_report">Report a bug</string>
     <!-- Drawer footer icon labels (accessibility) -->
-    <string name="link_x">RimDroid on X</string>
-    <string name="link_reddit">RimDroid on Reddit</string>
+    <string name="link_x">PriDroid on X</string>
+    <string name="link_reddit">PriDroid on Reddit</string>
     <string name="link_support">Support the developer</string>
     <string name="link_soon">Coming soon</string>
     <!-- Captions shown under each drawer-footer icon. Brand names stay untranslated. -->
@@ -134,9 +134,9 @@ In the cloud: %2$s
     <string name="donate_title">Support development</string>
     <string name="donate_message">Enjoying PriDroid and want to support it?\n\nMade and maintained by: ko-fi.com/udarmolota\n\nEvery bit helps keep the work going. Thank you! ❤</string>
     <!-- External links. url_x carries what url_reddit used to. -->
-    <string name="url_github_releases" translatable="false">https://github.com/udarmolota/rimdroid/releases</string>
-    <string name="url_x" translatable="false">https://x.com/rimdroid</string>
-    <string name="url_reddit_sub" translatable="false">https://www.reddit.com/r/rimdroid/</string>
+    <string name="url_github_releases" translatable="false">https://github.com/udarmolota/pridroid/releases</string>
+    <string name="url_x" translatable="false">https://x.com/pridroid</string>
+    <string name="url_reddit_sub" translatable="false">https://www.reddit.com/r/pridroid/</string>
     <string name="on_screen_controls">On-screen controls</string>
     <string name="edit_controls">Edit on-screen controls…</string>
     <string name="editor_bg_set">Background</string>
@@ -194,7 +194,7 @@ In the cloud: %2$s
     <string name="download_tab_game">Game</string>
     <string name="download_tab_dlc">DLC</string>
     <string name="download_tab_mods">Mods</string>
-    <string name="download_dlc_note">Pick the DLC your account owns. Each downloads as a portable .zip into /Download/RimDroid — import it into any instance from the menu. (Unowned DLC are skipped.)</string>
+    <string name="download_dlc_note">Pick the DLC your account owns. Each downloads as a portable .zip into /Download/PriDroid — import it into any instance from the menu. (Unowned DLC are skipped.)</string>
     <string name="download_dlc_start">Download selected DLC</string>
     <string name="download_install_content">Install a downloaded mod into an instance…</string>
     <string name="download_mods_note">Download Prison Architect Workshop mods by ID (the number in …/sharedfiles/filedetails/?id=NUMBER). No Steam login or account is needed. Several IDs can be separated by spaces. Each mod is saved as a .zip in /Download/PriDroid.</string>

@@ -1,4 +1,4 @@
-name: Build RimDroid APK
+name: Build PriDroid APK
 
 on:
   push:
@@ -47,8 +47,8 @@ jobs:
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: rimdroid-debug-${{ github.sha }}
-          path: app/build/outputs/apk/debug/rimdroid-debug.apk
+          name: pridroid-debug-${{ github.sha }}
+          path: app/build/outputs/apk/debug/pridroid-debug.apk
           retention-days: 30
 
       - name: Build Release APK (unsigned)
@@ -59,6 +59,6 @@ jobs:
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: rimdroid-release-${{ github.sha }}
-          path: app/build/outputs/apk/release/rimdroid-release.apk
+          name: pridroid-release-${{ github.sha }}
+          path: app/build/outputs/apk/release/pridroid-release.apk
           retention-days: 30

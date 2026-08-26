@@ -1,17 +1,17 @@
 /*
  * SPDX-License-Identifier: MIT
  *
- * libasound (ALSA) shim → AAudio — by udarmolota for RimDroid.
+ * libasound (ALSA) shim → AAudio — by udarmolota for PriDroid.
  * Copyright (c) 2026 udarmolota
  *
- * This single file is MIT-licensed (NOT the GPL-3.0 of the rest of RimDroid).
+ * This single file is MIT-licensed (NOT the GPL-3.0 of the rest of PriDroid).
  *
  * WHY: RimWorld's FMOD probes PulseAudio first, then ALSA. With no pulse libs present, FMOD falls back
  * to its ALSA output. This is a minimal native ARM64 libasound.so.2 implementing the synchronous
  * snd_pcm_* subset FMOD's ALSA output uses, backed by AAudio. No async callbacks / no mainloop (unlike
  * the pulse async API). snd_pcm_writei maps 1:1 to a blocking AAudio write.
  *
- * Built with soname "libasound.so.2" and preloaded by name (RimDroidApplication) so box64's
+ * Built with soname "libasound.so.2" and preloaded by name (PriDroidApplication) so box64's
  * wrappedlibasound dlopen("libasound.so.2") resolves to it. Heavily logged for bring-up.
  *
  * hw_params/sw_params are treated as OPAQUE blobs — we never parse them; the setters that matter store
@@ -30,7 +30,7 @@
 
 #define RD_TWO_PI 6.28318530717958647692
 
-#define TAG "RimDroid/alsa"
+#define TAG "PriDroid/alsa"
 /* Log to BOTH logcat AND stderr — box64's stderr folds into Unity's Player.log, so these lines show up
  * in "Export logs (ZIP)" too (no separate logcat capture needed). All call sites pass a literal format. */
 #define LOGI(...) do { __android_log_print(ANDROID_LOG_INFO,  TAG, __VA_ARGS__); \
@@ -204,11 +204,11 @@ EXPORT int  snd_pcm_hw_params_set_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *p,
 }
 EXPORT int  snd_pcm_hw_params_set_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *p, int fmt) {
     (void)p;
-    /* FIX/TEST (env RIMDROID_AUDIO_FORCE_FLOAT=1): reject integer formats so FMOD outputs FLOAT32 instead.
+    /* FIX/TEST (env PRIDROID_AUDIO_FORCE_FLOAT=1): reject integer formats so FMOD outputs FLOAT32 instead.
      * box64 miscompiles FMOD's emulated float→int16 SSE conversion (sine test proved our path is clean, so
      * the garbage is FMOD's int16 data). If FMOD hands us float, that broken conversion is skipped and we
      * feed float straight to AAudio (native-float on this device → no conversion at all). */
-    if (getenv("RIMDROID_AUDIO_FORCE_FLOAT") && fmt != SND_PCM_FORMAT_FLOAT_LE) {
+    if (getenv("PRIDROID_AUDIO_FORCE_FLOAT") && fmt != SND_PCM_FORMAT_FLOAT_LE) {
         LOGI("set_format alsa=%d REJECTED (forcing FLOAT32)", fmt);
         return -22 /*-EINVAL → FMOD tries the next format (FLOAT)*/;
     }
@@ -261,7 +261,7 @@ EXPORT int  snd_pcm_hw_params_is_batch(const snd_pcm_hw_params_t *p) { (void)p; 
 EXPORT int  snd_pcm_hw_params_current(snd_pcm_t *pcm, snd_pcm_hw_params_t *p) { (void)pcm; (void)p; LOGI("hw_params_current"); return 0; }
 EXPORT int  snd_pcm_hw_params_test_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *p, int fmt) {
     (void)pcm; (void)p;
-    if (getenv("RIMDROID_AUDIO_FORCE_FLOAT")) return (fmt==SND_PCM_FORMAT_FLOAT_LE)?0:-22;  /* advertise FLOAT only */
+    if (getenv("PRIDROID_AUDIO_FORCE_FLOAT")) return (fmt==SND_PCM_FORMAT_FLOAT_LE)?0:-22;  /* advertise FLOAT only */
     return (fmt==SND_PCM_FORMAT_S16_LE||fmt==SND_PCM_FORMAT_FLOAT_LE||fmt==SND_PCM_FORMAT_S32_LE)?0:-22; }
 EXPORT int  snd_pcm_hw_params_test_rate(snd_pcm_t *pcm, snd_pcm_hw_params_t *p, unsigned int r, int dir) {
     (void)pcm;(void)p;(void)r;(void)dir; return 0; }
@@ -381,11 +381,11 @@ EXPORT snd_pcm_sframes_t snd_pcm_writei(snd_pcm_t *pcm, const void *buf, snd_pcm
     if (!pcm->stream) return -5 /*-EIO*/;
     pcm->state = SND_PCM_STATE_RUNNING;
 
-    /* ===== DIAGNOSTIC 1: dump the RAW PCM FMOD gives us, to <HOME>/fmod_dump.raw (env RIMDROID_AUDIO_DUMP=1).
+    /* ===== DIAGNOSTIC 1: dump the RAW PCM FMOD gives us, to <HOME>/fmod_dump.raw (env PRIDROID_AUDIO_DUMP=1).
      * Pull it and import in Audacity as S16_LE / 48000 / stereo. If the file is ALSO noise, the corruption is
      * upstream (box64-emulated FMOD), not our AAudio path. Capped at ~20s so the file stays small. */
     static FILE *dumpf = NULL; static int dumpDone = 0; static long dumpFrames = 0;
-    if (getenv("RIMDROID_AUDIO_DUMP") && !dumpDone) {
+    if (getenv("PRIDROID_AUDIO_DUMP") && !dumpDone) {
         /* Skip leading SILENCE: the first writei calls happen during the (long, under box64) load before
          * the menu music starts, so FMOD feeds zeros. Begin the dump only once a buffer actually has sound,
          * otherwise we capture 20s of silence and miss the real (noisy) music. */
@@ -418,7 +418,7 @@ EXPORT snd_pcm_sframes_t snd_pcm_writei(snd_pcm_t *pcm, const void *buf, snd_pcm
     /* ===== DIAGNOSTIC 1b: log PCM STATISTICS (no Audacity needed). Reveals the corruption character:
      * flipRate≈0.5 + high RMS = white noise; low flipRate w/ recognizable peaks = tonal/music; high clip%
      * = saturation/wrap bug; high zero% chunks = dropouts/race. Treats data as S16 (FMOD outputs S16). */
-    if (getenv("RIMDROID_AUDIO_DUMP") && pcm->fmt == AAUDIO_FORMAT_PCM_I16 && (wcount % 200) == 0) {
+    if (getenv("PRIDROID_AUDIO_DUMP") && pcm->fmt == AAUDIO_FORMAT_PCM_I16 && (wcount % 200) == 0) {
         const int16_t *s = (const int16_t *) buf;
         size_t n = (size_t) size * (size_t) pcm->channels;
         long long sum = 0, sumsq = 0; int mn = 32767, mx = -32768;
@@ -440,10 +440,10 @@ EXPORT snd_pcm_sframes_t snd_pcm_writei(snd_pcm_t *pcm, const void *buf, snd_pcm
              (double) sum / (double) n, n);
     }
 
-    /* ===== DIAGNOSTIC 2: replace FMOD's audio with a clean 440Hz sine (env RIMDROID_AUDIO_SINE=1) to test our
+    /* ===== DIAGNOSTIC 2: replace FMOD's audio with a clean 440Hz sine (env PRIDROID_AUDIO_SINE=1) to test our
      * AAudio output path in isolation. Clean tone = AAudio/shim path is correct → the garbage is FMOD's data. */
     void *sinebuf = NULL;
-    if (getenv("RIMDROID_AUDIO_SINE")) {
+    if (getenv("PRIDROID_AUDIO_SINE")) {
         static double phase = 0.0;
         double inc = RD_TWO_PI * 440.0 / (double) (pcm->rate ? pcm->rate : 48000);
         if (pcm->fmt == AAUDIO_FORMAT_PCM_FLOAT) {
@@ -538,7 +538,7 @@ EXPORT int snd_pcm_recover(snd_pcm_t *pcm, int err, int silent) {
 
 /* ============================ enumeration / misc ============================ */
 EXPORT int snd_pcm_hw_free(snd_pcm_t *pcm) { (void)pcm; LOGI("snd_pcm_hw_free"); return 0; }
-EXPORT const char *snd_strerror(int e) { (void)e; return "rimdroid-alsa"; }
+EXPORT const char *snd_strerror(int e) { (void)e; return "pridroid-alsa"; }
 EXPORT int snd_card_next(int *card) { if (card) *card = -1; return 0; }   /* no hw cards → FMOD uses "default" */
 EXPORT int snd_lib_error_set_handler(void *h) { (void)h; return 0; }
 EXPORT int snd_config_update_free_global(void) { return 0; }

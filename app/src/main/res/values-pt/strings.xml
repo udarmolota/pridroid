@@ -103,8 +103,8 @@ Na nuvem: %2$s
     <string name="nav_updates">Novas versões (GitHub)</string>
     <string name="nav_bug_report">Relatar um problema</string>
     <!-- Drawer footer icon labels (accessibility) -->
-    <string name="link_x">RimDroid no X</string>
-    <string name="link_reddit">RimDroid no Reddit</string>
+    <string name="link_x">PriDroid no X</string>
+    <string name="link_reddit">PriDroid no Reddit</string>
     <string name="link_support">Apoiar o desenvolvedor</string>
     <string name="link_soon">Em breve</string>
     <string name="bug_report_subject">PRIDROID REPORT %1$s</string>
@@ -168,7 +168,7 @@ Na nuvem: %2$s
     <string name="download_tab_game">Jogo</string>
     <string name="download_tab_dlc">DLC</string>
     <string name="download_tab_mods">Mods</string>
-    <string name="download_dlc_note">Escolha os DLCs que a sua conta tem. Cada um é baixado como um .zip portátil em /Download/RimDroid; importe para qualquer instância pelo menu. (DLCs que você não tem são ignorados.)</string>
+    <string name="download_dlc_note">Escolha os DLCs que a sua conta tem. Cada um é baixado como um .zip portátil em /Download/PriDroid; importe para qualquer instância pelo menu. (DLCs que você não tem são ignorados.)</string>
     <string name="download_dlc_start">Baixar os DLCs selecionados</string>
     <string name="download_install_content">Instalar um mod baixado em uma instância…</string>
     <string name="download_mods_note">Baixe mods de Prison Architect pelo ID da Oficina. Não é necessário ter conta nem entrar na Steam. Vários IDs podem ser separados por espaços. Cada um é salvo como .zip em /Download/PriDroid.</string>

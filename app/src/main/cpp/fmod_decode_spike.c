@@ -5,7 +5,7 @@
 // Vorbis decode. This is the de-risk for an on-device "generate sound pack from your own
 // game files" feature (no redistribution: the user's files, decoded locally).
 //
-// Throwaway spike: librimdroid exports one JNI method; Java passes the FSB blob path, the
+// Throwaway spike: libpridroid exports one JNI method; Java passes the FSB blob path, the
 // libfmod.so path, an output WAV path, the clip's sample rate, and the FMOD version of that
 // lib. We dlopen/dlsym FMOD, create a NOSOUND system, CreateSound(OPENMEMORY|CREATESAMPLE),
 // lock the decoded PCM, write a WAV. Returns a human-readable status string.
@@ -19,7 +19,7 @@
 #include <android/log.h>
 #include "fmod_min.h"
 
-#define TAG "RimDroid/FmodSpike"
+#define TAG "PriDroid/FmodSpike"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,  TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 
@@ -74,7 +74,7 @@ static char *read_slice(const char *path, long long offset, long long size) {
 }
 
 JNIEXPORT jint JNICALL
-Java_com_rimdroid_audio_FmodDecodeSpike_nativeDecodeClip(
+Java_com_pridroid_audio_FmodDecodeSpike_nativeDecodeClip(
         JNIEnv *env, jclass clazz,
         jstring jFmodLib, jint fmodVersion, jstring jResource,
         jlong offset, jlong size, jstring jOutWav, jint srcRate, jint targetRate, jint outChannels) {

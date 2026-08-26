@@ -108,8 +108,8 @@
     <string name="nav_import_layout">Импорт раскладки управления…</string>
     <string name="nav_updates">Новые версии (GitHub)</string>
     <string name="nav_bug_report">Сообщить об ошибке</string>
-    <string name="link_x">RimDroid в X</string>
-    <string name="link_reddit">RimDroid на Reddit</string>
+    <string name="link_x">PriDroid в X</string>
+    <string name="link_reddit">PriDroid на Reddit</string>
     <string name="link_support">Поддержать разработчика</string>
     <string name="link_soon">Скоро</string>
     <string name="nav_label_donate">Донат</string>
@@ -178,7 +178,7 @@
     <string name="download_tab_game">Игра</string>
     <string name="download_tab_dlc">DLC</string>
     <string name="download_tab_mods">Моды</string>
-    <string name="download_dlc_note">Выберите DLC, которыми владеет ваш аккаунт. Каждое скачивается портативным .zip в /Download/RimDroid — затем импортируйте его в любой инстанс из меню. (Чужие DLC пропускаются.)</string>
+    <string name="download_dlc_note">Выберите DLC, которыми владеет ваш аккаунт. Каждое скачивается портативным .zip в /Download/PriDroid — затем импортируйте его в любой инстанс из меню. (Чужие DLC пропускаются.)</string>
     <string name="download_dlc_start">Скачать выбранные DLC</string>
     <string name="download_install_content">Установить скачанный мод в инстанс…</string>
     <string name="download_mods_note">Скачивание модов Prison Architect по ID Мастерской (число в …/sharedfiles/filedetails/?id=ЧИСЛО). Аккаунт и вход в Steam не нужны. Несколько ID можно указать через пробел. Каждый мод сохраняется в .zip в /Download/PriDroid.</string>

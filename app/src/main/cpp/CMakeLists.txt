@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4.1)
-project(rimdroid)
+project(pridroid)
 message(STATUS "CMake configuring at: ${CMAKE_CURRENT_SOURCE_DIR}")
 string(TIMESTAMP BUILD_TIME "%Y-%m-%d %H:%M:%S")
 message(STATUS "Build time: ${BUILD_TIME}")
@@ -12,14 +12,14 @@ set(CMAKE_C_STANDARD 11)
 add_subdirectory(liblinkernsbypass)
 
 # ---------------------------------------------------------------------------
-# librimdroid — surface management, renderer init, JNI bridge
+# libpridroid — surface management, renderer init, JNI bridge
 # Equivalent to libzomdroid in Zomdroid (without GLFW / JVM parts)
 # ---------------------------------------------------------------------------
-add_library(rimdroid SHARED
-    rimdroid.c
-    rimdroid_jni.c
+add_library(pridroid SHARED
+    pridroid.c
+    pridroid_jni.c
 )
-target_link_libraries(rimdroid
+target_link_libraries(pridroid
     log
     android
     EGL
@@ -28,12 +28,12 @@ target_link_libraries(rimdroid
 )
 
 # ---------------------------------------------------------------------------
-# librimdroidxserver.so — native side of the ported Winlator X server (LGPL-2.1,
+# libpridroidxserver.so — native side of the ported Winlator X server (LGPL-2.1,
 # from brunodev85/winlator-app): unix-socket epoll transport (xconnector), 2D
 # drawable primitives, SysV-SHM emulation. JNI symbols renamed com_winlator ->
-# com_rimdroid. Used by the RimWorld 1.6 X11/Vulkan path (memory rimworld_16_port).
+# com_pridroid. Used by the RimWorld 1.6 X11/Vulkan path (memory rimworld_16_port).
 # ---------------------------------------------------------------------------
-add_library(rimdroidxserver SHARED
+add_library(pridroidxserver SHARED
     xserver/xconnector_epoll.c
     xserver/xinput_stream.c
     xserver/xoutput_stream.c
@@ -41,8 +41,8 @@ add_library(rimdroidxserver SHARED
     xserver/sysvshared_memory.c
     xserver/arrays.c
 )
-target_include_directories(rimdroidxserver PRIVATE xserver)
-target_link_libraries(rimdroidxserver
+target_include_directories(pridroidxserver PRIVATE xserver)
+target_link_libraries(pridroidxserver
     log
     android
     jnigraphics
@@ -51,7 +51,7 @@ target_link_libraries(rimdroidxserver
 # ---------------------------------------------------------------------------
 # libfmoddecode.so — STANDALONE offline FSB5-Vorbis -> PCM WAV decoder (native FMOD).
 # Deliberately does NOT link linkernsbypass/box64: it is loaded ONLY in the separate
-# ":fmoddec" process (where librimdroidlinker is NOT loaded), so its dlopen of the
+# ":fmoddec" process (where libpridroidlinker is NOT loaded), so its dlopen of the
 # bundled libfmod.so is the real bionic dlopen in the normal app namespace — avoiding
 # the in-process crash (box64's interposed dlopen loads libfmod into a namespace that
 # lacks libc++_shared/libaaudio -> libfmod init SIGSEGVs). See fmod_decode_spike.c.
@@ -66,7 +66,7 @@ target_link_libraries(fmoddecode
 # libpulsesimpleshim.so — tiny PulseAudio "simple" API shim backed by AAudio.
 # RimWorld's FMOD probes libpulse-simple.so.0 for output; we provide the 7 funcs
 # box64's wrappedpulsesimple bridges. Built with DT_SONAME "libpulse-simple.so.0"
-# so that, once preloaded by name (RimDroidApplication), box64's wrapper
+# so that, once preloaded by name (PriDroidApplication), box64's wrapper
 # dlopen("libpulse-simple.so.0") resolves to this library. See pulse_simple_shim.c.
 # ---------------------------------------------------------------------------
 add_library(pulsesimpleshim SHARED pulse_simple_shim.c)
@@ -142,47 +142,47 @@ if(_box64_wrapper_srcs)
 endif()
 
 # ---------------------------------------------------------------------------
-# librimdroidlinker — box64 + linker hook + emulation
+# libpridroidlinker — box64 + linker hook + emulation
 # Equivalent to libzomdroidlinker in Zomdroid
 # Link order: c before box64 to prevent mmap override
 # ---------------------------------------------------------------------------
-add_library(rimdroidlinker SHARED
+add_library(pridroidlinker SHARED
     linker.c
     emulation.c
 )
-target_include_directories(rimdroidlinker PRIVATE
+target_include_directories(pridroidlinker PRIVATE
     ${BOX64_ROOT}/src/include
     ${BOX64_ROOT}/src
 )
 # Must match the DYNAREC/ARM64 flags used when building box64 so box64context_t layout is identical
-target_compile_definitions(rimdroidlinker PRIVATE DYNAREC ARM64)
-target_link_libraries(rimdroidlinker PRIVATE
+target_compile_definitions(pridroidlinker PRIVATE DYNAREC ARM64)
+target_link_libraries(pridroidlinker PRIVATE
     c
     log
     $<TARGET_OBJECTS:mainobj>
     $<TARGET_OBJECTS:interpreter>
     dynarec
-    rimdroid
+    pridroid
 )
-target_link_options(rimdroidlinker PRIVATE "-Wl,-z,global")
+target_link_options(pridroidlinker PRIVATE "-Wl,-z,global")
 
 # ---------------------------------------------------------------------------
-# librimdroid_exec.so — STANDALONE EXECUTABLE (not a library).
+# libpridroid_exec.so — STANDALONE EXECUTABLE (not a library).
 # The "lib*.so" name is the Android packaging trick: the APK build extracts it
 # into the app's nativeLibraryDir with exec permission, so the Java launcher can
 # exec() it as a fresh process.  A fresh process gives box64 a clean address
 # space (RimWorld's fixed 0x021a9000 free, no ART heap → NO fork needed) and a
 # fresh binder ProcessState → GPU context can be created+used without fork.
-# It links librimdroid.so (which has rimdroid_run_standalone + the launch logic;
-# box64 itself is dlopen'd at runtime via librimdroidlinker.so, same as the JNI
+# It links libpridroid.so (which has pridroid_run_standalone + the launch logic;
+# box64 itself is dlopen'd at runtime via libpridroidlinker.so, same as the JNI
 # path).  Android NDK builds executables as PIE by default.
 # ---------------------------------------------------------------------------
-add_executable(rimdroid_exec rimdroid_main.c)
-set_target_properties(rimdroid_exec PROPERTIES
+add_executable(pridroid_exec pridroid_main.c)
+set_target_properties(pridroid_exec PROPERTIES
     PREFIX "lib"
     SUFFIX ".so"
-    OUTPUT_NAME "rimdroid_exec")
-target_link_libraries(rimdroid_exec
-    rimdroid
+    OUTPUT_NAME "pridroid_exec")
+target_link_libraries(pridroid_exec
+    pridroid
     log
     android)

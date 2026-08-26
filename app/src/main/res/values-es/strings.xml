@@ -101,8 +101,8 @@ En la nube: %2$s
     <string name="nav_updates">Nuevas versiones (GitHub)</string>
     <string name="nav_bug_report">Reportar un error</string>
     <!-- Drawer footer icon labels (accessibility) -->
-    <string name="link_x">RimDroid en X</string>
-    <string name="link_reddit">RimDroid en Reddit</string>
+    <string name="link_x">PriDroid en X</string>
+    <string name="link_reddit">PriDroid en Reddit</string>
     <string name="link_support">Apoyar al desarrollador</string>
     <string name="link_soon">Próximamente</string>
     <string name="bug_report_subject">PRIDROID REPORT %1$s</string>
@@ -166,7 +166,7 @@ En la nube: %2$s
     <string name="download_tab_game">Juego</string>
     <string name="download_tab_dlc">DLC</string>
     <string name="download_tab_mods">Mods</string>
-    <string name="download_dlc_note">Elige los DLC que tenga tu cuenta. Cada uno se descarga como un .zip portable en /Download/RimDroid; impórtalo en cualquier instancia desde el menú. (Los DLC que no tengas se omiten.)</string>
+    <string name="download_dlc_note">Elige los DLC que tenga tu cuenta. Cada uno se descarga como un .zip portable en /Download/PriDroid; impórtalo en cualquier instancia desde el menú. (Los DLC que no tengas se omiten.)</string>
     <string name="download_dlc_start">Descargar los DLC seleccionados</string>
     <string name="download_install_content">Instalar un mod descargado en una instancia…</string>
     <string name="download_mods_note">Descarga mods de Prison Architect por ID del Workshop. No hace falta una cuenta ni iniciar sesión en Steam. Puedes poner varios ID separados por espacios. Cada uno se guarda como .zip en /Download/PriDroid.</string>

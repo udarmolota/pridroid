@@ -14,7 +14,7 @@ extern char **environ;
 #include "debug.h"
 #include "env.h"
 
-#define LOG_TAG "rimdroid-emu"
+#define LOG_TAG "pridroid-emu"
 
 // box64 core entry points (defined in box64/src/core.c)
 typedef struct elfheader_s elfheader_t;
@@ -30,12 +30,12 @@ static void* get_self_handle() {
 
 static const char* get_self_path() {
     Dl_info info;
-    if (!dladdr((void*)rimdroid_run_elf, &info) || !info.dli_fname)
+    if (!dladdr((void*)pridroid_run_elf, &info) || !info.dli_fname)
         return "/system/bin/sh";   // fallback: a file that always exists
     const char* fname = info.dli_fname;
     // On Android with extractNativeLibs=false, .so files are mapped directly
     // from the APK, so dladdr returns a ZIP-entry path like:
-    //   /data/app/~~.../base.apk!/lib/arm64-v8a/librimdroidlinker.so
+    //   /data/app/~~.../base.apk!/lib/arm64-v8a/libpridroidlinker.so
     // realpath() cannot resolve this; strip everything from '!' onward and
     // return just the APK path, which IS a real file realpath() can handle.
     const char* bang = strchr(fname, '!');
@@ -51,7 +51,7 @@ static const char* get_self_path() {
     return fname;
 }
 
-int rimdroid_emulation_init() {
+int pridroid_emulation_init() {
     box64_pagesize = sysconf(_SC_PAGESIZE);
     if (!box64_pagesize) box64_pagesize = 4096;
 
@@ -70,7 +70,7 @@ int rimdroid_emulation_init() {
 }
 
 __attribute__((visibility("default"), used))
-int rimdroid_run_elf(const char* path, int argc, const char** argv) {
+int pridroid_run_elf(const char* path, int argc, const char** argv) {
     // box64 initialize() expects: argv[0]="box64", argv[1]=ELF_path, argv[2..]=ELF_args
     // Our argv already has path at [0]; prepend a fake "box64" slot (= our own path).
     //
