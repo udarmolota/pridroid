@@ -86,7 +86,6 @@ public final class LogExporter {
     /** Human-readable launcher/device state: the first file to inspect in every report. */
     private static void addPriDroidInfo(android.content.Context ctx, GameInstance gi,
                                         ZipOutputStream zos, Result r) throws java.io.IOException {
-        InstanceSettings s = gi.settings();
         File game = new File(gi.getGamePath(), C.files.GAME_BIN);
         StringBuilder b = new StringBuilder(1024);
         b.append("PriDroid ").append(BuildConfig.VERSION_NAME)
@@ -98,20 +97,39 @@ public final class LogExporter {
          .append(" / API ").append(android.os.Build.VERSION.SDK_INT).append('\n')
          .append("ABIs: ").append(java.util.Arrays.toString(android.os.Build.SUPPORTED_ABIS)).append('\n')
          .append("Instance: ").append(gi.getName()).append('\n')
-         .append("Game binary: ").append(game.isFile() ? game.length() + " bytes" : "missing").append('\n')
-         .append("Renderer: ").append(s.getRenderer()).append('\n')
-         .append("Vulkan driver: ")
-         .append(VulkanDriverPolicy.displayName(s.getVulkanDriverSo())).append('\n')
-         .append("Render scale: ").append(s.getRenderScalePercent()).append("%\n")
-         .append("Fixed resolution mode: ").append(s.getFixedResMode()).append('\n')
-         .append("FPS cap: ").append(s.getFpsCap()).append('\n')
-         .append("Texture profile: ").append(s.getTexTier()).append('\n')
-         .append("Drag-to-pan: ").append(s.isDragPan()).append('\n')
-         .append("Compatibility mode: ").append(s.isCompatibilityMode()).append('\n')
-         .append("Interpreter: ").append(s.isInterpreter()).append('\n')
-         .append("Debug mode: ").append(s.isDebug()).append('\n')
-         .append("Custom driver present: ").append(CustomDriverInstaller.isInstalled()).append('\n')
-         .append("Extra env vars: ").append(s.getEnvVars().isEmpty() ? "none" : "set (redacted)").append('\n');
+         .append("Game binary: ").append(game.isFile() ? game.length() + " bytes" : "missing").append('\n');
+
+        // Diagnostics must never prevent the diagnostics archive itself from being created. In
+        // particular, getEnvVars() legitimately returns null when the advanced field is unset;
+        // calling isEmpty() on it used to abort before the first ZIP entry and leave a valid but
+        // completely empty 22-byte archive. Treat every settings read as best-effort so a stale or
+        // malformed preference is reported here instead of making bug reporting fail again.
+        try {
+            InstanceSettings s = gi.settings();
+            String envVars = s.getEnvVars();
+            b.append("Renderer: ").append(s.getRenderer()).append('\n')
+             .append("Vulkan driver: ")
+             .append(VulkanDriverPolicy.displayName(s.getVulkanDriverSo())).append('\n')
+             .append("Render scale: ").append(s.getRenderScalePercent()).append("%\n")
+             .append("Fixed resolution mode: ").append(s.getFixedResMode()).append('\n')
+             .append("FPS cap: ").append(s.getFpsCap()).append('\n')
+             .append("Texture profile: ").append(s.getTexTier()).append('\n')
+             .append("Drag-to-pan: ").append(s.isDragPan()).append('\n')
+             .append("Compatibility mode: ").append(s.isCompatibilityMode()).append('\n')
+             .append("Interpreter: ").append(s.isInterpreter()).append('\n')
+             .append("Debug mode: ").append(s.isDebug()).append('\n')
+             .append("Custom driver present: ").append(CustomDriverInstaller.isInstalled()).append('\n')
+             .append("Extra env vars: ")
+             .append(envVars == null || envVars.trim().isEmpty() ? "none" : "set (redacted)")
+             .append('\n');
+        } catch (Throwable t) {
+            b.append("Settings diagnostics failed: ")
+             .append(t.getClass().getName());
+            if (t.getMessage() != null && !t.getMessage().isEmpty()) {
+                b.append(": ").append(t.getMessage());
+            }
+            b.append('\n');
+        }
         byte[] data = b.toString().getBytes(StandardCharsets.UTF_8);
         zos.putNextEntry(new ZipEntry("pridroid_info.txt"));
         zos.write(data);

@@ -64,7 +64,8 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "pridroid-${variant.buildType.name}.apk"
+            // versionName above is the single source of truth for local and CI filenames.
+            outputFileName = "pridroid-${variant.buildType.name}-${variant.versionName}.apk"
         }
     }
 }
