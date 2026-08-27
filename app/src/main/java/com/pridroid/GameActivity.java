@@ -46,8 +46,14 @@ public class GameActivity extends Activity implements SurfaceHolder.Callback {
             default: return com.pridroid.xserver.Pointer.Button.BUTTON_LEFT;
         }
     }
+    /** True when the game's SDL runs against our X server (rd_x11): input then flows through X
+     *  ONLY. With both paths active the game saw every tap twice (ring + X), and the duplicated
+     *  ButtonRelease closed every freshly opened dropdown list on arrival. The ring stays in use
+     *  for what X cannot carry: IME text (nativeText) and keys with no X mapping. */
+    public static volatile boolean x11InputOnly;
+
     public static void touchInput(int action, int x, int y) {
-        try { nativeTouch(action, x, y); } catch (UnsatisfiedLinkError ignored) {}
+        if (!x11InputOnly) try { nativeTouch(action, x, y); } catch (UnsatisfiedLinkError ignored) {}
         com.pridroid.xserver.XServer xs = com.pridroid.xserver.XServerRunner.getXServer();
         if (xs == null) return;
         xs.injectPointerMove(x, y);
@@ -55,7 +61,7 @@ public class GameActivity extends Activity implements SurfaceHolder.Callback {
         else if (action == 2) xs.injectPointerButtonRelease(com.pridroid.xserver.Pointer.Button.BUTTON_LEFT);
     }
     public static void buttonInput(int button, int down, int x, int y) {
-        try { nativeButton(button, down, x, y); } catch (UnsatisfiedLinkError ignored) {}
+        if (!x11InputOnly) try { nativeButton(button, down, x, y); } catch (UnsatisfiedLinkError ignored) {}
         com.pridroid.xserver.XServer xs = com.pridroid.xserver.XServerRunner.getXServer();
         if (xs == null) return;
         xs.injectPointerMove(x, y);
@@ -116,6 +122,9 @@ public class GameActivity extends Activity implements SurfaceHolder.Callback {
         }
     }
     public static void keyInput(int scancode, int keycode, int down) {
+        // Keys ALWAYS go through the ring, X11 mode included: the game's SDL turned out to
+        // ignore our X key events entirely (the ring is what typed all along, so unlike mouse
+        // buttons there was never real key duplication to remove).
         try { nativeKey(scancode, keycode, down); } catch (UnsatisfiedLinkError ignored) {}
         com.pridroid.xserver.XServer xs = com.pridroid.xserver.XServerRunner.getXServer();
         if (xs == null) return;
@@ -197,7 +206,7 @@ public class GameActivity extends Activity implements SurfaceHolder.Callback {
     }
 
     public static void scrollInput(int x, int y, int dy) {
-        try { nativeScroll(x, y, dy); } catch (UnsatisfiedLinkError ignored) {}
+        if (!x11InputOnly) try { nativeScroll(x, y, dy); } catch (UnsatisfiedLinkError ignored) {}
         com.pridroid.xserver.XServer xs = com.pridroid.xserver.XServerRunner.getXServer();
         if (xs == null) return;
         xs.injectPointerMove(x, y);

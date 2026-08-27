@@ -871,6 +871,7 @@ public class GameLauncher {
         // "dummy" is always compiled into SDL2 and does nothing (unlike "offscreen"
         // which may not be compiled in the game's statically-linked SDL2 build).
         Os.setenv("SDL_VIDEODRIVER", "dummy", true);
+        GameActivity.x11InputOnly = false;   // dummy SDL: input reaches the game via the ring
         Os.setenv("SDL_AUDIODRIVER", "dummy", true);
         // Suppress ALSA errors (no ALSA on Android)
         Os.setenv("ALSA_CONFIG_PATH", "/dev/null", true);
@@ -922,6 +923,7 @@ public class GameLauncher {
             // uninitialised in 2022 → "Error getting num native displays" → crash on an empty
             // displays array).
             Os.setenv("SDL_VIDEODRIVER", "x11", true);
+            GameActivity.x11InputOnly = true;    // X carries mouse/keys; ring only for IME text
             // Force SDL to use our root visual by id (bypasses XMatchVisualInfo, which was failing to
             // match our depth-32 TrueColor visual → SDL added 0 displays → Unity crashed). See
             // memory rimworld_16_port.
