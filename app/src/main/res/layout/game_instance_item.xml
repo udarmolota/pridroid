@@ -20,7 +20,7 @@
         android:layout_gravity="top|start"
         android:scaleType="fitStart"
         android:alpha="0.16"
-        android:src="@drawable/pridroid_logo"
+        android:src="@drawable/pd_logo_small"
         android:contentDescription="@null" />
 
     <LinearLayout

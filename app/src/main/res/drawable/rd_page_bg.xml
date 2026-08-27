@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Window background for all screens. The inherited PriDroid green-star watermark was removed:
-     it conflicts with the Prison Architect blue/orange identity. -->
+<!-- Window background for all screens: the theme surface colour + a faint piece of the
+     PriDroid logo anchored to the bottom-right, cropped so the emblem visibly continues past
+     the screen edge (same construction as RimDroid's rd_watermark, rebuilt from the PriDroid
+     logo; the fade is baked into pd_watermark's alpha channel). -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/md_theme_background" />
+    <item>
+        <bitmap
+            android:src="@drawable/pd_watermark"
+            android:gravity="bottom|right" />
+    </item>
 </layer-list>
