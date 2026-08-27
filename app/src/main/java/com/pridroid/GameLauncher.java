@@ -195,6 +195,10 @@ public class GameLauncher {
             String updated = setPref(text,    "ShowAttractScreen", "true");
             updated        = setPref(updated, "RecentMap",         "(empty)");
             updated        = setPref(updated, "FirstTime",         "false");
+            // Interface scale. Locale.ROOT matters: the game parses "1.500000", and a Russian
+            // locale would otherwise format it as "1,500000" and silently reset the UI to 1x.
+            updated        = setPref(updated, "UiScale", String.format(java.util.Locale.ROOT,
+                    "%.6f", gameInstance.settings().getUiScalePercent() / 100f));
             if (!updated.equals(text)) {
                 java.io.File parent = prefs.getParentFile();
                 if (parent != null) parent.mkdirs();

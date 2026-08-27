@@ -378,6 +378,27 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        // Interface scale: writes Prison Architect's own UiScale preference (see InstanceSettings).
+        // Presets are whole quarters; 1.5 was the value that made the UI comfortable on an 8.8"
+        // tablet at 1280x800, so the list brackets that generously in both directions.
+        android.widget.RadioGroup rgUiScale = view.findViewById(R.id.rg_uiscale);
+        final int[] uiScalePcts = {100, 125, 150, 175, 200};
+        final int curUiScale = inst.getUiScalePercent();
+        for (int pct : uiScalePcts) {
+            android.widget.RadioButton rb = new android.widget.RadioButton(requireContext());
+            rb.setId(View.generateViewId());
+            rb.setText(String.format(java.util.Locale.getDefault(), "%.2f\u00d7", pct / 100f)
+                    .replace(".00", "").replace(",00", ""));
+            rb.setTag(pct);
+            rgUiScale.addView(rb);
+            if (pct == curUiScale) rgUiScale.check(rb.getId());
+        }
+        rgUiScale.setOnCheckedChangeListener((group, checkedId) -> {
+            View rb = group.findViewById(checkedId);
+            if (rb == null || rb.getTag() == null) return;
+            inst.setUiScalePercent((Integer) rb.getTag());
+        });
+
         // Prison Architect texture profile: original desktop images or the game's own -safemode.
         // The old inherited three-tier glTexStorage2D shrinker does not see PA's legacy uploads.
         android.widget.RadioGroup rgTexq = view.findViewById(R.id.rg_texq);

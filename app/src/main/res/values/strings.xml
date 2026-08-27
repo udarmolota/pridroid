@@ -267,4 +267,6 @@ In the cloud: %2$s
         <item>L3 — Shift (multi-select)</item>
         <item>R3 — Right stick press (unused)</item>
     </string-array>
+    <string name="uiscale_label">Interface scale</string>
+    <string name="uiscale_hint">Enlarges Prison Architect’s own interface and fonts — the game has no such setting of its own. It pairs with the render resolution: raise both by the same factor and the interface stays the same size on screen, only sharper.</string>
 </resources>

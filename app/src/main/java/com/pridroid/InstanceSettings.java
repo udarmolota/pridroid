@@ -146,6 +146,22 @@ public class InstanceSettings {
         p.edit().putInt(pfx + "tex_tier", tier).apply();
     }
 
+    // --- Prison Architect interface scale.
+    // The game multiplies every UI dimension by its own UiScale preference (Interface::UiScale),
+    // but ships no control for it, so a desktop-sized interface stays desktop-sized on a phone.
+    // Stored here as a percent; GameLauncher writes it into preferences.txt before the game boots.
+    // It pairs with the render resolution: raising both by the same factor keeps the interface the
+    // same apparent size while rendering it that many times sharper.
+    public static final int UI_SCALE_MIN = 100, UI_SCALE_MAX = 200;
+
+    public int getUiScalePercent() {
+        return p.getInt(pfx + "ui_scale_pct", 100);
+    }
+
+    public void setUiScalePercent(int pct) {
+        p.edit().putInt(pfx + "ui_scale_pct", Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, pct))).apply();
+    }
+
     // --- Haptic feedback: light vibration tick on on-screen button presses. Default OFF. ---
     public boolean isHapticFeedback() {
         return p.getBoolean(pfx + "haptic", global.isHapticFeedback());

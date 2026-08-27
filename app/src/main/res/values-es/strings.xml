@@ -239,4 +239,6 @@ En la nube: %2$s
         <item>L3 — Shift (selección múltiple)</item>
         <item>R3 — Pulsar stick derecho (sin uso)</item>
     </string-array>
+    <string name="uiscale_label">Escala de la interfaz</string>
+    <string name="uiscale_hint">Amplía la interfaz y las fuentes propias de Prison Architect: el juego no ofrece ese ajuste. Funciona junto con la resolución de renderizado: si sube ambas en la misma proporción, la interfaz conserva su tamaño pero se ve más nítida.</string>
 </resources>
