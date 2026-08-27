@@ -182,18 +182,22 @@ public class GameLauncher {
     private static void forceMainMenu(GameInstance gameInstance) {
         java.io.File prefs = new java.io.File(gameInstance.getGamePath(),
                 ".Prison Architect/preferences.txt");
-        if (!prefs.isFile()) return; // The game creates the complete defaults on its first run.
         try {
             java.nio.file.Path path = prefs.toPath();
-            String text = new String(java.nio.file.Files.readAllBytes(path),
-                    java.nio.charset.StandardCharsets.UTF_8);
-            String updated = text.replaceFirst(
-                    "(?m)^ShowAttractScreen[ \\t]+[^\\r\\n]*$",
-                    "ShowAttractScreen    true  ");
-            updated = updated.replaceFirst(
-                    "(?m)^RecentMap[ \\t]+[^\\r\\n]*$",
-                    "RecentMap            (empty)  ");
+            // On a brand-new instance the file does not exist yet, and the game's built-in default
+            // FirstTime=true auto-starts the campaign before it ever checks the attract screen.
+            // Seeding a minimal file avoids that: Directory::ReadPlainText accepts any subset of
+            // keys, and the game merges it over defaults and rewrites the full set on save.
+            String text = prefs.isFile()
+                    ? new String(java.nio.file.Files.readAllBytes(path),
+                            java.nio.charset.StandardCharsets.UTF_8)
+                    : "";
+            String updated = setPref(text,    "ShowAttractScreen", "true");
+            updated        = setPref(updated, "RecentMap",         "(empty)");
+            updated        = setPref(updated, "FirstTime",         "false");
             if (!updated.equals(text)) {
+                java.io.File parent = prefs.getParentFile();
+                if (parent != null) parent.mkdirs();
                 java.nio.file.Path tmp = new java.io.File(prefs.getParentFile(),
                         "preferences.txt.pridroid.tmp").toPath();
                 java.nio.file.Files.write(tmp, updated.getBytes(java.nio.charset.StandardCharsets.UTF_8));
@@ -205,10 +209,64 @@ public class GameLauncher {
                     java.nio.file.Files.move(tmp, path,
                             java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 }
-                postLog("Startup: main menu requested (RecentMap cleared)");
+                postLog("Startup: main menu requested (RecentMap cleared, FirstTime off)");
             }
         } catch (Throwable t) {
             Log.w(TAG, "Could not pin Prison Architect startup to the main menu", t);
+        }
+    }
+
+    /** Set "Key value" in Introversion's plain-text preference format, appending if absent. */
+    private static String setPref(String text, String key, String value) {
+        String line = String.format("%-20s %s", key, value);
+        java.util.regex.Pattern p =
+                java.util.regex.Pattern.compile("(?m)^" + key + "[ \\t]+[^\\r\\n]*$");
+        java.util.regex.Matcher m = p.matcher(text);
+        if (m.find()) return m.replaceFirst(java.util.regex.Matcher.quoteReplacement(line));
+        return text + (text.isEmpty() || text.endsWith("\n") ? "" : "\n") + line + "\n";
+    }
+
+    /** A valid zip archive with zero entries: just the 22-byte End-Of-Central-Directory record. */
+    private static final byte[] EMPTY_ZIP = {
+            0x50, 0x4B, 0x05, 0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    /**
+     * Park the premade-prison archive and mount an empty one so the attract screen finds no
+     * candidate maps.
+     *
+     * prisons.dat holds ONLY the 20 showcase prisons (7-17 MB each). At startup the game lists
+     * data/premadeprisons/*.prison from that archive and loads one at random UNDER the main menu -
+     * on a phone that is a ~2-minute load, single-digit FPS and an eventual OOM kill. With the
+     * list empty, AttractScreen::LoadNewMap() returns false and the game falls back to a small
+     * freshly generated world under the same, fully working main menu. The only other consumer of
+     * the archive is the in-game "Premade Prisons" browser (it lists nothing while the stub is in
+     * place). The original stays alongside as prisons.dat.orig. This runs on every launch, so
+     * getting premades back needs the .orig renamed back AND this call disabled.
+     */
+    private static void stubPremadePrisonArchive(GameInstance gameInstance) {
+        java.io.File dat  = new java.io.File(gameInstance.getGamePath(), "prisons.dat");
+        java.io.File orig = new java.io.File(gameInstance.getGamePath(), "prisons.dat.orig");
+        try {
+            if (dat.isFile() && dat.length() <= EMPTY_ZIP.length) return; // stub already in place
+            if (!dat.isFile() && !orig.isFile()) return;                  // no archive in this install
+            if (dat.isFile() && !orig.isFile() && !dat.renameTo(orig)) {
+                Log.w(TAG, "Could not park prisons.dat; premade attract prisons stay enabled");
+                return;
+            }
+            java.nio.file.Path tmp = new java.io.File(gameInstance.getGamePath(),
+                    "prisons.dat.pridroid.tmp").toPath();
+            java.nio.file.Files.write(tmp, EMPTY_ZIP);
+            try {
+                java.nio.file.Files.move(tmp, dat.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException ignored) {
+                java.nio.file.Files.move(tmp, dat.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+            postLog("Startup: premade prisons parked - menu opens over a generated backdrop");
+        } catch (Throwable t) {
+            Log.w(TAG, "Could not stub out the premade-prison archive", t);
         }
     }
 
@@ -222,6 +280,7 @@ public class GameLauncher {
         paSettings.setInterpreter(false);
         paSettings.setCompatibilityMode(false);
         forceMainMenu(gameInstance);
+        stubPremadePrisonArchive(gameInstance);
 
         // --- Audio (always on) ---
         // Load the libasound→AAudio output shim on every launch. Its DT_SONAME is "libasound.so.2", so
