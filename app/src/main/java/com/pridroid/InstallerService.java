@@ -175,6 +175,12 @@ public class InstallerService extends Service {
         }
         bin.setExecutable(true);
 
+        // One-time load-time optimization: the GOG .dat archives are solid RARs that the game
+        // unpacks with its embedded unrar on EVERY launch (~46 s under box64 on a Snapdragon
+        // 8 Elite). Converting them to stored zips here makes that phase near-instant; see
+        // DatRepacker for the full story. Non-fatal on failure.
+        DatRepacker.repackAll(instanceDir, this::broadcastProgress);
+
         // Game-fix reference assets must exist before configure (steam-lib normalization reads
         // them from files/gamefix). Idempotent; normally a no-op after first app start.
         RimWorldInstanceSetup.ensureGameFixAssets(getApplicationContext());

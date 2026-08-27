@@ -61,6 +61,8 @@ Bouncy Castle (bcprov) Bouncy Castle License Copyright (c) The Legion of the Bou
 JavaSteam              MIT License          Copyright (c) Lossy / JavaSteam contributors
 javasteam-depotdownloader  MIT License      Copyright (c) JavaSteam contributors
 zstd-jni               BSD 2-Clause License Copyright (c) 2015-2024 Luben Karavelov
+junrar                 UnRAR License        Copyright (c) junrar team / Alexander
+                       (decompression only)  Roshal (original unrar algorithms)
 
 --------------------------------------------------------------------------------
 ICONS

@@ -16,6 +16,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }   // 7-Zip-JBinding-4Android (native RAR extractor)
     }
 }
 

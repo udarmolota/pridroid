@@ -284,6 +284,11 @@ public class GameLauncher {
         paSettings.setTexTier(InstanceSettings.TEX_NONE);
         forceMainMenu(gameInstance);
         stubPremadePrisonArchive(gameInstance);
+        // Safety net for the fast-loading .dat conversion: normally done once at install
+        // (InstallerService), but retry here in case that run was interrupted or the archives were
+        // added later. A no-op when every .dat is already a zip, so it costs nothing on a normal
+        // launch; only a still-RAR archive triggers a one-time conversion before the game boots.
+        DatRepacker.repackAll(new java.io.File(gameInstance.getGamePath()), GameLauncher::postLog);
 
         // --- Audio (always on) ---
         // Load the libasound→AAudio output shim on every launch. Its DT_SONAME is "libasound.so.2", so

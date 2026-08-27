@@ -89,6 +89,11 @@ dependencies {
     implementation 'org.apache.commons:commons-compress:1.26.1'
     implementation 'org.tukaani:xz:1.11'   // VZipUtil (LZMAInputStream); 1.11 = version JavaSteam 1.8.0 was built against
     implementation 'com.google.code.gson:gson:2.10.1'
+    // Native RAR extractor for DatRepacker's one-time .dat conversion at instance install.
+    // junrar (pure-Java) was tried first but silently mis-decodes Prison Architect's solid RAR4
+    // archives (verified: 1138/1150 files wrong). 7-Zip-JBinding wraps p7zip's native codec,
+    // ships an arm64-v8a .so, and decodes them correctly.
+    implementation 'com.github.omicronapps:7-Zip-JBinding-4Android:Release-16.02-2.03'
 
     // --- In-app Steam downloader SPIKE (Milestone 0) — JavaSteam (MIT, SteamKit2 port) ---
     // Proves on-device QR/Steam-Mobile login + (later) depot download, no Termux/PC.
