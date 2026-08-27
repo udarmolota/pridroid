@@ -279,6 +279,9 @@ public class GameLauncher {
         paSettings.setRenderer(LauncherPreferences.Renderer.ZINK_ZFA);
         paSettings.setInterpreter(false);
         paSettings.setCompatibilityMode(false);
+        // The quality selector is hidden (see fragment_settings.xml): pin the tier so a stored
+        // "Low" from an old build cannot keep launching the touch-breaking -safemode invisibly.
+        paSettings.setTexTier(InstanceSettings.TEX_NONE);
         forceMainMenu(gameInstance);
         stubPremadePrisonArchive(gameInstance);
 

@@ -143,13 +143,15 @@
     </com.google.android.material.card.MaterialCardView>
 
     <!-- ============================ COMPRESSION ============================ -->
-    <!-- Texture quality: Half = the GL-layer shim halves mipped textures (4x less texture
-         memory) — for DLC-heavy loads and weaker phones. The chooser sits ABOVE its
-         explanatory text so the choice reads first and the "why" follows. -->
+    <!-- Texture quality card — HIDDEN for now. The only alternative to the original textures was
+         the game's own -safemode ("Low"), which renders at ~1024x768 and breaks touch mapping;
+         with one usable option left there is nothing to choose. Restore by removing
+         android:visibility="gone" once a second working profile exists. -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
+        android:visibility="gone"
         app:cardCornerRadius="14dp"
         app:cardElevation="2dp">
 

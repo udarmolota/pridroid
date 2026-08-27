@@ -132,13 +132,14 @@ public class InstanceSettings {
 
     // --- Prison Architect texture profile.
     // NONE = original desktop textures. LOW = the game's own -safemode, which scales oversized
-    // images before GL upload and avoids the >600 MiB graphics footprint seen at native quality.
-    // ULTRA is retained only so old inherited preferences deserialize safely; the PriDroid UI no
-    // longer exposes it and treats it like LOW. ---
+    // images before GL upload — but it also drops the game to ~1024x768, which breaks the
+    // image-to-touch coordinate mapping, so the launcher no longer offers it (the selector card
+    // in fragment_settings.xml is hidden and launch() pins the tier to NONE). LOW/ULTRA are
+    // retained only so old preferences deserialize safely. ---
     public static final int TEX_NONE = 0, TEX_LOW = 1, TEX_ULTRA = 2;
 
     public int getTexTier() {
-        return p.getInt(pfx + "tex_tier", TEX_LOW);
+        return p.getInt(pfx + "tex_tier", TEX_NONE);
     }
 
     public void setTexTier(int tier) {
