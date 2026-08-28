@@ -280,7 +280,11 @@ public class GameLauncher {
         // Prison Architect's fixed-function OpenGL renderer. Do not inherit stale PriDroid choices
         // for MobileGlues/interpreter/Mono compatibility — their controls are hidden in this fork.
         InstanceSettings paSettings = gameInstance.settings();
-        paSettings.setRenderer(LauncherPreferences.Renderer.ZINK_ZFA);
+        // Renderer comes from the instance settings (Zink by default, MobileGlues where a broken
+        // Vulkan driver makes Zink crash). Anything else inherited from older builds is not a
+        // supported path for this game, so it collapses to the default rather than being launched.
+        if (paSettings.getRenderer() != LauncherPreferences.Renderer.MOBILEGLUES)
+            paSettings.setRenderer(LauncherPreferences.Renderer.ZINK_ZFA);
         paSettings.setInterpreter(false);
         paSettings.setCompatibilityMode(false);
         // The quality selector is hidden (see fragment_settings.xml): pin the tier so a stored
@@ -437,7 +441,9 @@ public class GameLauncher {
         Os.setenv("BOX64_LD_LIBRARY_PATH", gameInstance.getLdLibraryPathForEmulation(), true);
 
         // Renderer-specific env vars
-        LauncherPreferences.Renderer renderer = LauncherPreferences.Renderer.ZINK_ZFA;
+        // Read the instance's renderer choice (normalised above: ZINK_ZFA or MOBILEGLUES). This
+        // was hardcoded to ZINK_ZFA during the port, which silently overrode the settings UI.
+        LauncherPreferences.Renderer renderer = paSettings.getRenderer();
         // RimWorld 1.6 GLES pivot: the "rd_force_gles" marker forces the ZINK_ZFA renderer
         // (real desktop GL Core over Zink/Turnip). Unity 1.6 creates its GL context via GLX;
         // box64's wrappedlibgl.c routes glX* -> ZFA, so Unity renders GL and presents via

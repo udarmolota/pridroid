@@ -31,25 +31,24 @@
             android:text="@string/card_video"
             android:layout_marginBottom="6dp" />
 
-        <!-- Renderer chooser, back from the dead (2026-08-09): the A11/Adreno-640 hang proved
-             SOFTPIPE (CPU, no Vulkan at all) is the only path for devices whose Vulkan driver
-             breaks zink — a player got RimWorld's loading screen with it on a phone where zink
-             hangs forever. Known defect being debugged: Unity's scene mostly misses FBO 0
-             (pale/dark picture) — see SettingsFragment for state. GL4ES/ZINK_OSMESA stay gone. -->
+        <!-- Renderer chooser. Zink is the proven path on Adreno, but it is not universal: a
+             Mali-G57 tester crashes in the very first frame's draw calls, with a log identical
+             to a working Adreno one right up to that point. MobileGlues renders through the
+             phone's own GLES driver with no Vulkan involved, so it is the alternative to try
+             where Zink dies. Unproven for Prison Architect: the game draws with fixed-function
+             GL (glBegin, display lists), which GLES has none of and MobileGlues must emulate. -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/renderer"
             android:textAppearance="?attr/textAppearanceTitleSmall"
-            android:layout_marginBottom="4dp"
-            android:visibility="gone" />
+            android:layout_marginBottom="4dp" />
 
         <RadioGroup
             android:id="@+id/rg_renderer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone">
+            android:layout_marginBottom="16dp">
 
           <RadioButton
               android:id="@+id/rb_zink_zfa"

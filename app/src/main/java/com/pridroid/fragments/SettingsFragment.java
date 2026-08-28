@@ -67,10 +67,18 @@ public class SettingsFragment extends Fragment {
         final android.widget.Button btnSteamDl = view.findViewById(R.id.btn_steam_dl);
         final TextView tvSteamDlStatus = view.findViewById(R.id.tv_steam_dl_status);
 
-        // Prison Architect currently has one proven path: fixed-function desktop GL through a ZFA
-        // compatibility context. The inherited renderer chooser is hidden in XML; normalise stale
-        // PriDroid preferences here as well as at launch.
-        inst.setRenderer(LauncherPreferences.Renderer.ZINK_ZFA);
+        // Renderer. Zink (ZFA compatibility context) is the default and the only path proven for
+        // Prison Architect, but it is not universal - see the layout comment. MobileGlues is the
+        // fallback for devices whose Vulkan driver breaks Zink. Any other value inherited from
+        // older builds (GL4ES plumbing token, OSMesa, softpipe) collapses to the default.
+        android.widget.RadioGroup rgRenderer = view.findViewById(R.id.rg_renderer);
+        final boolean usingMg = inst.getRenderer() == LauncherPreferences.Renderer.MOBILEGLUES;
+        if (!usingMg) inst.setRenderer(LauncherPreferences.Renderer.ZINK_ZFA);
+        rgRenderer.check(usingMg ? R.id.rb_mobileglues : R.id.rb_zink_zfa);
+        rgRenderer.setOnCheckedChangeListener((group, checkedId) -> inst.setRenderer(
+                checkedId == R.id.rb_mobileglues
+                        ? LauncherPreferences.Renderer.MOBILEGLUES
+                        : LauncherPreferences.Renderer.ZINK_ZFA));
         swDebug.setChecked(inst.isDebug());
         swStrict.setChecked(inst.isInterpreter());
         swDragPan.setChecked(inst.isDragPan());
