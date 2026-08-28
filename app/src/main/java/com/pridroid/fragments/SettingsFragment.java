@@ -72,12 +72,18 @@ public class SettingsFragment extends Fragment {
         // fallback for devices whose Vulkan driver breaks Zink. Any other value inherited from
         // older builds (GL4ES plumbing token, OSMesa, softpipe) collapses to the default.
         android.widget.RadioGroup rgRenderer = view.findViewById(R.id.rg_renderer);
-        final boolean usingMg = inst.getRenderer() == LauncherPreferences.Renderer.MOBILEGLUES;
-        if (!usingMg) inst.setRenderer(LauncherPreferences.Renderer.ZINK_ZFA);
-        rgRenderer.check(usingMg ? R.id.rb_mobileglues : R.id.rb_zink_zfa);
+        LauncherPreferences.Renderer curRenderer = inst.getRenderer();
+        if (curRenderer != LauncherPreferences.Renderer.NG_GL4ES) {
+            // MOBILEGLUES included: it runs but renders black (no gl_Color/gl_FrontColor in its
+            // shader translator), so a stored value must not keep launching it invisibly.
+            curRenderer = LauncherPreferences.Renderer.ZINK_ZFA;
+            inst.setRenderer(curRenderer);
+        }
+        rgRenderer.check(curRenderer == LauncherPreferences.Renderer.NG_GL4ES
+                ? R.id.rb_ng_gl4es : R.id.rb_zink_zfa);
         rgRenderer.setOnCheckedChangeListener((group, checkedId) -> inst.setRenderer(
-                checkedId == R.id.rb_mobileglues
-                        ? LauncherPreferences.Renderer.MOBILEGLUES
+                checkedId == R.id.rb_ng_gl4es
+                        ? LauncherPreferences.Renderer.NG_GL4ES
                         : LauncherPreferences.Renderer.ZINK_ZFA));
         swDebug.setChecked(inst.isDebug());
         swStrict.setChecked(inst.isInterpreter());

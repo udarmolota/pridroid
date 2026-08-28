@@ -243,4 +243,5 @@ Na nuvem: %2$s
     </string-array>
     <string name="uiscale_label">Escala da interface</string>
     <string name="uiscale_hint">Aumenta a interface e as fontes do próprio Prison Architect — o jogo não tem essa opção. Funciona junto com a resolução de renderização: aumente as duas na mesma proporção e a interface mantém o tamanho, apenas mais nítida.</string>
+    <string name="ng_gl4es_label">NG-GL4ES (GL sobre GLES — para Mali e outras GPUs que não sejam Adreno)</string>
 </resources>

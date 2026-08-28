@@ -283,7 +283,10 @@ public class GameLauncher {
         // Renderer comes from the instance settings (Zink by default, MobileGlues where a broken
         // Vulkan driver makes Zink crash). Anything else inherited from older builds is not a
         // supported path for this game, so it collapses to the default rather than being launched.
-        if (paSettings.getRenderer() != LauncherPreferences.Renderer.MOBILEGLUES)
+        // Allowed: ZINK_ZFA (default, Adreno) and NG_GL4ES (no-Vulkan path). A stored MOBILEGLUES
+        // collapses too - it runs but renders black; its plumbing stays reachable via an explicit
+        // PRIDROID_GLT in the extra-env field for A/B tests.
+        if (paSettings.getRenderer() != LauncherPreferences.Renderer.NG_GL4ES)
             paSettings.setRenderer(LauncherPreferences.Renderer.ZINK_ZFA);
         paSettings.setInterpreter(false);
         paSettings.setCompatibilityMode(false);
@@ -454,7 +457,8 @@ public class GameLauncher {
         // EGL-translator backend (rd_bridge_*), so Unity's glX calls can land on the
         // GL4ES/EGL context running MobileGlues instead of ZFA. Every other renderer
         // still pins to ZFA on 1.6.
-        if (forceGlesZfa && renderer == LauncherPreferences.Renderer.MOBILEGLUES) {
+        if (forceGlesZfa && (renderer == LauncherPreferences.Renderer.MOBILEGLUES
+                          || renderer == LauncherPreferences.Renderer.NG_GL4ES)) {
             android.util.Log.i("PriDroid", "GameLauncher: rd_force_gles + MOBILEGLUES -> GLX->EGL-translator bridge (experimental)");
         } else if (forceGlesZfa) {
             renderer = LauncherPreferences.Renderer.ZINK_ZFA;
@@ -492,6 +496,10 @@ public class GameLauncher {
             if (glTranslator == null && renderer == LauncherPreferences.Renderer.MOBILEGLUES) {
                 glTranslator = "libmobileglues.so";
                 android.util.Log.i("PriDroid", "GameLauncher: renderer=MOBILEGLUES -> translator libmobileglues.so");
+            }
+            if (glTranslator == null && renderer == LauncherPreferences.Renderer.NG_GL4ES) {
+                glTranslator = "libng_gl4es.so";
+                android.util.Log.i("PriDroid", "GameLauncher: renderer=NG_GL4ES -> translator libng_gl4es.so");
             }
             if (glTranslator != null) {
                 renderer = LauncherPreferences.Renderer.GL4ES;   // reuse the whole GL4ES/EGL plumbing

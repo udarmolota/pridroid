@@ -22,7 +22,12 @@ public class LauncherPreferences {
         // 62 fps single-thread, see memory gl_translator_smoke). Launch-wise it is the GL4ES/EGL
         // plumbing with libmobileglues.so; GameLauncher maps it there and pridroid.c never sees
         // this enum name (it receives the GL4ES token).
-        MOBILEGLUES("libGL.so.1");
+        MOBILEGLUES("libGL.so.1"),
+        // NG-GL4ES: the same GL4ES/EGL plumbing with libng_gl4es.so. Its GLSL converter rewrites
+        // the compatibility builtins Prison Architect's shaders are written against (gl_Color,
+        // gl_FrontColor, gl_TexCoord, gl_ModelViewProjectionMatrix), which is exactly where
+        // MobileGlues stops. Bundled from the shared Zomdroid library set (bundle v6).
+        NG_GL4ES("libGL.so.1");
 
         public final String libName;
         Renderer(String libName) { this.libName = libName; }

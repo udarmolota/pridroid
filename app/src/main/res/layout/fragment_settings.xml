@@ -57,10 +57,20 @@
               android:text="@string/zink_zfa_label" />
 
           <RadioButton
+              android:id="@+id/rb_ng_gl4es"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/ng_gl4es_label" />
+
+          <!-- MobileGlues: runs the game but renders black - its shader translator lacks the
+               gl_Color/gl_FrontColor builtins every PA shader uses. Hidden until that changes;
+               the plumbing stays reachable through an explicit PRIDROID_GLT for A/B tests. -->
+          <RadioButton
               android:id="@+id/rb_mobileglues"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="@string/mobileglues_label" />
+              android:text="@string/mobileglues_label"
+              android:visibility="gone" />
         </RadioGroup>
 
         <TextView

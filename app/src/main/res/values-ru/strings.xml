@@ -254,4 +254,5 @@
     </string-array>
     <string name="uiscale_label">Масштаб интерфейса</string>
     <string name="uiscale_hint">Увеличивает собственный интерфейс и шрифты Prison Architect — у самой игры такой настройки нет. Работает в паре с разрешением рендера: поднимите оба во столько же раз — интерфейс останется того же размера, но станет чётче.</string>
+    <string name="ng_gl4es_label">NG-GL4ES (GL через GLES — для Mali и других не-Adreno)</string>
 </resources>
