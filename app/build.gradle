@@ -13,8 +13,8 @@ android {
         applicationId "com.pridroid"
         minSdk = 30
         targetSdk = 35
-        versionCode 1
-        versionName "0.1.0"
+        versionCode 2
+        versionName "0.1.1"
         // JavaSteam + protobuf + kotlin push us past the 64K method limit. minSdk 30 has
         // native multidex, but the build still needs this flag to split the dex.
         multiDexEnabled true
