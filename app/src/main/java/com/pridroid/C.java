@@ -19,7 +19,8 @@ public class C {
         //        libresolv, libuuid, libbsd, libmd) — see RD/prison_architect_port_brief.md
         // v6 = + libng_gl4es.so; v7 = + its libspirv-cross-c-shared.so dependency;
         // v8 = PriDroid NG-GL4ES framebuffer lifecycle fix (force refresh on existing installs).
-        public static final int BUNDLE_VERSION = 8;
+        // v9 = NG-GL4ES runtime diagnostics/cache paths moved from ZomDroid to PriDroid.
+        public static final int BUNDLE_VERSION = 9;
         // x86_64 game libs (libgcc_s.so.1, libjniwrapper.so, etc.)
         public static final String LIBS_LINUX_X86_64 = ROOT + "/linux-x86_64";
         // Android ARM64 renderer libs — all in one flat directory

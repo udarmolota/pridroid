@@ -706,6 +706,141 @@ static EGLBoolean rd_eglSwapBuffers(EGLDisplay d, EGLSurface s) {
     return g_glt_egl.swap ? g_glt_egl.swap(d, s) : eglSwapBuffers(d, s);
 }
 
+// ---- Low-frequency present diagnostics -------------------------------------------------------
+// A long-running Prison Architect session can keep simulating, accepting input and updating the
+// Java FPS counter while the game image is black.  The counter is bumped before this function, so
+// it does not prove that EGL accepted the frame.  Keep a cheap flight recorder here, at the final
+// GL -> Android hand-off, so a field report can distinguish three otherwise identical symptoms:
+//   1. eglSwapBuffers is failing (lost context/surface),
+//   2. the native GLES back buffer is already black (translator/rendering problem), or
+//   3. it contains colour but Android is not presenting it (window/compositor problem).
+//
+// The pixel probe runs only once every 15 seconds.  Nine 1x1 reads do synchronize with the GPU,
+// but at that cadence their cost is negligible and they avoid copying a full framebuffer.
+typedef struct {
+    EGLDisplay current_display;
+    EGLContext current_context;
+    EGLSurface current_draw;
+    EGLSurface current_read;
+    EGLint surface_width;
+    EGLint surface_height;
+    int native_fbo;
+    unsigned int fbo_status;
+    int viewport[4];
+    unsigned int rgb[9];
+    int sample_count;
+    int nonblack_samples;
+} RdEgltPresentProbe;
+
+static const char* rd_egl_error_name(EGLint error) {
+    switch (error) {
+        case EGL_SUCCESS:             return "EGL_SUCCESS";
+        case EGL_NOT_INITIALIZED:     return "EGL_NOT_INITIALIZED";
+        case EGL_BAD_ACCESS:          return "EGL_BAD_ACCESS";
+        case EGL_BAD_ALLOC:           return "EGL_BAD_ALLOC";
+        case EGL_BAD_ATTRIBUTE:       return "EGL_BAD_ATTRIBUTE";
+        case EGL_BAD_CONTEXT:         return "EGL_BAD_CONTEXT";
+        case EGL_BAD_CONFIG:          return "EGL_BAD_CONFIG";
+        case EGL_BAD_CURRENT_SURFACE: return "EGL_BAD_CURRENT_SURFACE";
+        case EGL_BAD_DISPLAY:         return "EGL_BAD_DISPLAY";
+        case EGL_BAD_SURFACE:         return "EGL_BAD_SURFACE";
+        case EGL_BAD_MATCH:           return "EGL_BAD_MATCH";
+        case EGL_BAD_PARAMETER:       return "EGL_BAD_PARAMETER";
+        case EGL_BAD_NATIVE_PIXMAP:   return "EGL_BAD_NATIVE_PIXMAP";
+        case EGL_BAD_NATIVE_WINDOW:   return "EGL_BAD_NATIVE_WINDOW";
+        case EGL_CONTEXT_LOST:        return "EGL_CONTEXT_LOST";
+        default:                      return "EGL_UNKNOWN";
+    }
+}
+
+static void rd_eglt_collect_present_probe(RdEgltPresentProbe* p) {
+    memset(p, 0, sizeof(*p));
+    p->surface_width = -1;
+    p->surface_height = -1;
+    p->native_fbo = -1;
+    p->viewport[0] = p->viewport[1] = p->viewport[2] = p->viewport[3] = -1;
+
+    p->current_display = eglGetCurrentDisplay();
+    p->current_context = eglGetCurrentContext();
+    p->current_draw = eglGetCurrentSurface(EGL_DRAW);
+    p->current_read = eglGetCurrentSurface(EGL_READ);
+    if (g_egl_display && g_egl_surface) {
+        eglQuerySurface(g_egl_display, g_egl_surface, EGL_WIDTH, &p->surface_width);
+        eglQuerySurface(g_egl_display, g_egl_surface, EGL_HEIGHT, &p->surface_height);
+    }
+
+    if (p->current_context == EGL_NO_CONTEXT) return;
+
+    typedef void (*PFN_rdGlGetIntegerv)(unsigned int, int*);
+    typedef unsigned int (*PFN_rdGlCheckFramebufferStatus)(unsigned int);
+    typedef void (*PFN_rdGlReadPixels)(int, int, int, int, unsigned int, unsigned int, void*);
+    static PFN_rdGlGetIntegerv p_get_int = NULL;
+    static PFN_rdGlCheckFramebufferStatus p_check_fbo = NULL;
+    static PFN_rdGlReadPixels p_read_pixels = NULL;
+    static int resolved = 0;
+    if (!resolved) {
+        resolved = 1;
+        p_get_int = (PFN_rdGlGetIntegerv)pridroid_gles_resolver("glGetIntegerv");
+        p_check_fbo = (PFN_rdGlCheckFramebufferStatus)
+            pridroid_gles_resolver("glCheckFramebufferStatus");
+        p_read_pixels = (PFN_rdGlReadPixels)pridroid_gles_resolver("glReadPixels");
+    }
+
+    if (p_get_int) {
+        p_get_int(0x8CA6 /* GL_FRAMEBUFFER_BINDING */, &p->native_fbo);
+        p_get_int(0x0BA2 /* GL_VIEWPORT */, p->viewport);
+    }
+    if (p_check_fbo)
+        p->fbo_status = p_check_fbo(0x8D40 /* GL_FRAMEBUFFER */);
+
+    if (!p_read_pixels || p->surface_width <= 0 || p->surface_height <= 0 ||
+        p->fbo_status != 0x8CD5 /* GL_FRAMEBUFFER_COMPLETE */)
+        return;
+
+    const int xs[3] = {
+        p->surface_width / 8,
+        p->surface_width / 2,
+        (p->surface_width * 7) / 8
+    };
+    const int ys[3] = {
+        p->surface_height / 8,
+        p->surface_height / 2,
+        (p->surface_height * 7) / 8
+    };
+    for (int y = 0; y < 3; ++y) {
+        for (int x = 0; x < 3; ++x) {
+            unsigned char rgba[4] = {0, 0, 0, 0};
+            p_read_pixels(xs[x], ys[y], 1, 1,
+                          0x1908 /* GL_RGBA */, 0x1401 /* GL_UNSIGNED_BYTE */, rgba);
+            unsigned int rgb = ((unsigned int)rgba[0] << 16) |
+                               ((unsigned int)rgba[1] << 8) |
+                               (unsigned int)rgba[2];
+            p->rgb[p->sample_count++] = rgb;
+            if ((int)rgba[0] + (int)rgba[1] + (int)rgba[2] > 12)
+                p->nonblack_samples++;
+        }
+    }
+}
+
+static void rd_eglt_log_present_probe(const RdEgltPresentProbe* p,
+                                      uint64_t attempts, uint64_t successes,
+                                      uint64_t failures, EGLBoolean last_swap,
+                                      EGLint last_error, unsigned int black_streak) {
+    LOGI("EGLT present heartbeat: attempts=%llu ok=%llu failed=%llu last=%s error=0x%x/%s "
+         "expected[dpy=%p surface=%p primary_ctx=%p] current[dpy=%p ctx=%p draw=%p read=%p] "
+         "surface=%dx%d native_fbo=%d status=0x%x viewport=[%d,%d,%d,%d] "
+         "samples=%d nonblack=%d black_streak=%u rgb=[%06x,%06x,%06x,%06x,%06x,%06x,%06x,%06x,%06x]",
+         (unsigned long long)attempts, (unsigned long long)successes,
+         (unsigned long long)failures, last_swap ? "OK" : "FAILED", last_error,
+         rd_egl_error_name(last_error), g_egl_display, g_egl_surface, g_egl_context,
+         p->current_display, p->current_context, p->current_draw, p->current_read,
+         p->surface_width, p->surface_height, p->native_fbo, p->fbo_status,
+         p->viewport[0], p->viewport[1], p->viewport[2], p->viewport[3],
+         p->sample_count, p->nonblack_samples, black_streak,
+         p->rgb[0], p->rgb[1], p->rgb[2], p->rgb[3], p->rgb[4],
+         p->rgb[5], p->rgb[6], p->rgb[7], p->rgb[8]);
+}
+
 // ---- GLX -> EGL-translator bridge helpers (RimWorld 1.6 on MobileGlues/NG) --------
 // wrappedlibgl.c weak-imports these for its rd_bridge_* dispatch: when the renderer is
 // a GL->GLES translator (g_egl_context set, no ZFA), Unity's glX calls land on the one
@@ -725,7 +860,80 @@ int pridroid_eglt_release_current(void) {
     return rd_eglMakeCurrent(g_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT) ? 1 : 0;
 }
 void pridroid_eglt_swap(void) {
-    if (g_egl_display && g_egl_surface) rd_eglSwapBuffers(g_egl_display, g_egl_surface);
+    if (!g_egl_display || !g_egl_surface) return;
+
+    static uint64_t attempts = 0;
+    static uint64_t successes = 0;
+    static uint64_t failures = 0;
+    static uint64_t consecutive_failures = 0;
+    static uint64_t last_heartbeat_ns = 0;
+    static EGLint last_failure_error = EGL_SUCCESS;
+    static unsigned int black_streak = 0;
+    const uint64_t now = rd_now_ns();
+    const bool heartbeat_due = !last_heartbeat_ns ||
+        now - last_heartbeat_ns >= 15000000000ull;
+    RdEgltPresentProbe probe;
+    bool have_probe = false;
+
+    // Read the back buffer before a successful swap makes its contents undefined.
+    if (heartbeat_due) {
+        rd_eglt_collect_present_probe(&probe);
+        have_probe = true;
+    }
+
+    attempts++;
+    EGLBoolean ok = rd_eglSwapBuffers(g_egl_display, g_egl_surface);
+    EGLint error = EGL_SUCCESS;
+    if (ok) {
+        successes++;
+        if (consecutive_failures)
+            LOGI("EGLT: eglSwapBuffers recovered after %llu consecutive failure(s)",
+                 (unsigned long long)consecutive_failures);
+        consecutive_failures = 0;
+    } else {
+        // eglGetError must be the very next EGL call or another query can overwrite the evidence.
+        error = eglGetError();
+        failures++;
+        consecutive_failures++;
+        const bool error_changed = error != last_failure_error;
+        if (consecutive_failures <= 8 || error_changed ||
+            (consecutive_failures % 120) == 0) {
+            LOGE("EGLT: eglSwapBuffers FAILED: error=0x%x/%s consecutive=%llu total=%llu "
+                 "dpy=%p surface=%p",
+                 error, rd_egl_error_name(error),
+                 (unsigned long long)consecutive_failures,
+                 (unsigned long long)failures, g_egl_display, g_egl_surface);
+        }
+        last_failure_error = error;
+        // A pixel read synchronizes with the GPU.  Capture the first failure immediately, but do
+        // not turn a persistent 30-FPS failure into 30 GPU stalls and heartbeat lines per second.
+        if (!have_probe &&
+            (consecutive_failures == 1 || error_changed ||
+             (consecutive_failures % 900) == 0)) {
+            rd_eglt_collect_present_probe(&probe);
+            have_probe = true;
+        }
+    }
+
+    if (have_probe) {
+        const unsigned int previous_black_streak = black_streak;
+        if (probe.sample_count > 0 && probe.nonblack_samples == 0)
+            black_streak++;
+        else if (probe.nonblack_samples > 0)
+            black_streak = 0;
+
+        rd_eglt_log_present_probe(&probe, attempts, successes, failures, ok, error,
+                                  black_streak);
+        if (black_streak >= 3 &&
+            (black_streak == 3 || (black_streak % 4) == 0)) {
+            LOGW("EGLT: sustained black native back buffer: %u consecutive 15-second probe(s); "
+                 "simulation may still be running", black_streak);
+        } else if (previous_black_streak >= 3 && black_streak == 0) {
+            LOGI("EGLT: native back buffer recovered from %u black probe(s)",
+                 previous_black_streak);
+        }
+        last_heartbeat_ns = now;
+    }
 }
 
 // ---- Multi-context factory (bridge Level 3, 2026-08-13) --------------------------------------
