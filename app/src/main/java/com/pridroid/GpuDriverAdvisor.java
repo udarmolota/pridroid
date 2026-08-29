@@ -1,11 +1,14 @@
 package com.pridroid;
 
 /**
- * Detects the device GPU once and applies the matching recommended Vulkan driver to a freshly
- * created instance, so a new instance doesn't start on the System driver (which black-screens many
- * Adreno GPUs). The caller shows {@link Result} to the user and can offer "change in settings".
+ * Detects the device GPU once and applies the matching recommended launch profile to a freshly
+ * created instance: the Vulkan driver, plus conservative performance defaults for GPU families
+ * where field testing proved the general defaults too aggressive.
  */
 public final class GpuDriverAdvisor {
+
+    private static final int POWERVR_RENDER_SCALE_PERCENT = 50;
+    private static final int POWERVR_FPS_CAP = 30;
 
     private GpuDriverAdvisor() {}
 
@@ -14,11 +17,19 @@ public final class GpuDriverAdvisor {
         public final String driverLabel; // e.g. "Turnip Adreno 6xx (legacy)"
         public final String driverSo;    // soName written to the instance
         public final boolean applied;    // false if the instance already had an explicit driver
-        Result(String gpuName, String driverLabel, String driverSo, boolean applied) {
+        public final boolean performanceProfileApplied;
+        public final int recommendedRenderScalePercent; // 0 when no family-specific override
+        public final int recommendedFpsCap;              // 0 when no family-specific override
+        Result(String gpuName, String driverLabel, String driverSo, boolean applied,
+               boolean performanceProfileApplied, int recommendedRenderScalePercent,
+               int recommendedFpsCap) {
             this.gpuName = gpuName;
             this.driverLabel = driverLabel;
             this.driverSo = driverSo;
             this.applied = applied;
+            this.performanceProfileApplied = performanceProfileApplied;
+            this.recommendedRenderScalePercent = recommendedRenderScalePercent;
+            this.recommendedFpsCap = recommendedFpsCap;
         }
     }
 
@@ -40,6 +51,21 @@ public final class GpuDriverAdvisor {
             s.setVulkanDriverSo(so);
             applied = true;
         }
-        return new Result(gpu.displayName(), label, so, applied);
+
+        // Moto G56 field test (PowerVR BXM-8-256): Zink is playable on the system Vulkan driver,
+        // but its first 1800x810 / 60 FPS runs showed a black screen / visual artifacts. 1200x540
+        // (50% of its 2400x1080 panel) / 30 FPS ran smoothly and also reduces framebuffer pixels
+        // by 56%. Keep this PowerVR-only and never overwrite an explicit per-instance choice.
+        int renderScale = 0;
+        int fpsCap = 0;
+        boolean performanceApplied = false;
+        if (gpu.isPowerVr()) {
+            renderScale = POWERVR_RENDER_SCALE_PERCENT;
+            fpsCap = POWERVR_FPS_CAP;
+            performanceApplied = s.applyPerformanceDefaultsIfUnset(renderScale, fpsCap);
+        }
+
+        return new Result(gpu.displayName(), label, so, applied, performanceApplied,
+                renderScale, fpsCap);
     }
 }

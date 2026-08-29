@@ -17,7 +17,9 @@ public class C {
         //        own GLES driver, zero Vulkan — the broken-Vulkan/A11/Mali fallback)
         //   v5 = + 6 Debian x86_64 guest libs for Prison Architect (libGLU pre-GLVND, libz,
         //        libresolv, libuuid, libbsd, libmd) — see RD/prison_architect_port_brief.md
-        public static final int BUNDLE_VERSION = 7;   // v6 = + libng_gl4es.so; v7 = + its libspirv-cross-c-shared.so dependency
+        // v6 = + libng_gl4es.so; v7 = + its libspirv-cross-c-shared.so dependency;
+        // v8 = PriDroid NG-GL4ES framebuffer lifecycle fix (force refresh on existing installs).
+        public static final int BUNDLE_VERSION = 8;
         // x86_64 game libs (libgcc_s.so.1, libjniwrapper.so, etc.)
         public static final String LIBS_LINUX_X86_64 = ROOT + "/linux-x86_64";
         // Android ARM64 renderer libs — all in one flat directory

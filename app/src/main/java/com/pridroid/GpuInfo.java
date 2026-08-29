@@ -10,6 +10,7 @@ import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,6 +118,15 @@ public final class GpuInfo {
 
     public boolean isAdreno() {
         return adrenoModel > 0;
+    }
+
+    /** PowerVR drivers are not named consistently: some expose "PowerVR" in GL_RENDERER while
+     *  newer IMG B-series devices only identify Imagination Technologies in GL_VENDOR. */
+    public boolean isPowerVr() {
+        String r = renderer != null ? renderer.toLowerCase(Locale.ROOT) : "";
+        String v = vendor != null ? vendor.toLowerCase(Locale.ROOT) : "";
+        return r.contains("powervr") || r.contains("imagination")
+                || v.contains("powervr") || v.contains("imagination");
     }
 
     /** True when EGL returned a real renderer, including a positively identified non-Adreno GPU. */

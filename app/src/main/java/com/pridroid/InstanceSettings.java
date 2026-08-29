@@ -130,6 +130,24 @@ public class InstanceSettings {
         p.edit().putInt(pfx + "fps_cap", fps).apply();
     }
 
+    /** Apply device-specific defaults without replacing choices already saved for this instance. */
+    public boolean applyPerformanceDefaultsIfUnset(int renderScalePercent, int fpsCap) {
+        SharedPreferences.Editor edit = p.edit();
+        boolean changed = false;
+        if (!p.contains(pfx + "render_scale_pct")) {
+            edit.putInt(pfx + "render_scale_pct",
+                    Math.max(LauncherPreferences.RENDER_SCALE_ABS_MIN,
+                            Math.min(100, renderScalePercent)));
+            changed = true;
+        }
+        if (!p.contains(pfx + "fps_cap")) {
+            edit.putInt(pfx + "fps_cap", fpsCap);
+            changed = true;
+        }
+        if (changed) edit.apply();
+        return changed;
+    }
+
     // --- Prison Architect texture profile.
     // NONE = original desktop textures. LOW = the game's own -safemode, which scales oversized
     // images before GL upload — but it also drops the game to ~1024x768, which breaks the
@@ -258,4 +276,3 @@ public class InstanceSettings {
                 .apply();
     }
 }
-
