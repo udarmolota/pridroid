@@ -7,8 +7,9 @@ import android.view.KeyEvent;
 /**
  * Physical→logical gamepad button mapping (ported from Zomdroid's GamepadManager idea, simplified).
  *
- * RimWorld is mouse+keyboard, so {@link GamepadHandler} maps LOGICAL buttons (A/B/X/Y/…) to fixed
- * MNK actions (A=left click, etc.). This class sits in front of that: it maps each PHYSICAL Android
+ * Prison Architect is driven through PriDroid's mouse+keyboard bridge, so {@link GamepadHandler}
+ * maps LOGICAL buttons (A/B/X/Y/…) to fixed MNK/app actions. This class sits in front of that: it
+ * maps each PHYSICAL Android
  * keycode to a logical button index, so a controller with swapped/“inverted” buttons can be fixed
  * without touching the action layer — the user just records which physical button should be each
  * logical one (see {@code GamepadMapperActivity}).

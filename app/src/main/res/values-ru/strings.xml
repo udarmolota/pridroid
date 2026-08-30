@@ -241,16 +241,16 @@
     <string name="gamepad_mapper_done">Раскладка сохранена</string>
     <string name="gamepad_mapper_dup">Уже назначено — нажми другую кнопку</string>
     <string-array name="gamepad_mapper_labels">
-        <item>A — F1</item>
+        <item>A — Левый клик</item>
         <item>B — Escape</item>
-        <item>X — F2</item>
-        <item>Y — Q (поворот)</item>
+        <item>X — Правый клик</item>
+        <item>Y — R (поворот)</item>
         <item>LB — Отдалить</item>
         <item>RB — Приблизить</item>
-        <item>Select — Tab</item>
-        <item>Start — Следующий колонист (.)</item>
-        <item>L3 — Shift (множ. выделение)</item>
-        <item>R3 — нажатие правого стика (не исп.)</item>
+        <item>Select — Показать/скрыть клавиатуру</item>
+        <item>Start — Пауза (Space)</item>
+        <item>L3 — Shift</item>
+        <item>R3 — Показать/скрыть кнопки</item>
     </string-array>
     <string name="uiscale_label">Масштаб интерфейса</string>
     <string name="uiscale_hint">Увеличивает собственный интерфейс и шрифты Prison Architect — у самой игры такой настройки нет. Работает в паре с разрешением рендера: поднимите оба во столько же раз — интерфейс останется того же размера, но станет чётче.</string>
