@@ -20,7 +20,8 @@ public class C {
         // v6 = + libng_gl4es.so; v7 = + its libspirv-cross-c-shared.so dependency;
         // v8 = PriDroid NG-GL4ES framebuffer lifecycle fix (force refresh on existing installs).
         // v9 = NG-GL4ES runtime diagnostics/cache paths moved from ZomDroid to PriDroid.
-        public static final int BUNDLE_VERSION = 9;
+        // v10 = NG draw/state flight recorder for diagnosing long-session all-black frames.
+        public static final int BUNDLE_VERSION = 10;
         // x86_64 game libs (libgcc_s.so.1, libjniwrapper.so, etc.)
         public static final String LIBS_LINUX_X86_64 = ROOT + "/linux-x86_64";
         // Android ARM64 renderer libs — all in one flat directory

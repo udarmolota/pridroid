@@ -681,6 +681,9 @@ static struct {
     EGLBoolean (*destroy)(EGLDisplay, EGLContext);
     EGLBoolean (*swap)(EGLDisplay, EGLSurface);
 } g_glt_egl;
+// Handle of the active GL translator.  NG exposes a versioned, read-only diagnostic
+// snapshot through it; MobileGlues/classic GL4ES simply leave that probe unavailable.
+static void* g_glt_handle = NULL;
 
 static void pridroid_glt_egl_route(void* h) {
     const char* e = getenv("PRIDROID_GLT_EGLTRACK");
@@ -718,18 +721,63 @@ static EGLBoolean rd_eglSwapBuffers(EGLDisplay d, EGLSurface s) {
 // The pixel probe runs only once every 15 seconds.  Nine 1x1 reads do synchronize with the GPU,
 // but at that cadence their cost is negligible and they avoid copying a full framebuffer.
 typedef struct {
+    uint32_t abi_version;
+    uint32_t struct_size;
+    uint64_t api_draw_calls;
+    uint64_t api_draw_vertices;
+    uint64_t display_list_calls;
+    uint64_t driver_draw_calls;
+    uint64_t driver_draw_vertices;
+    uint64_t clear_calls;
+    uint64_t blit_calls;
+    uint64_t fbo_app_binds;
+    uint64_t fbo_native_binds;
+    uint64_t fbo_skipped_binds;
+    uint32_t last_draw_mode;
+    uint32_t last_clear_mask;
+    int32_t wrapper_state_valid;
+    int32_t wrapper_program;
+    int32_t wrapper_draw_fbo;
+    int32_t wrapper_read_fbo;
+    int32_t wrapper_viewport[4];
+    int32_t wrapper_scissor[4];
+    uint8_t wrapper_color_mask[4];
+    uint8_t wrapper_blend;
+    uint8_t wrapper_depth_test;
+    uint8_t wrapper_stencil_test;
+    uint8_t wrapper_cull_face;
+} RdNgDiagV1;
+
+typedef struct {
     EGLDisplay current_display;
     EGLContext current_context;
     EGLSurface current_draw;
     EGLSurface current_read;
+    EGLint client_version;
     EGLint surface_width;
     EGLint surface_height;
     int native_fbo;
+    int native_read_fbo;
     unsigned int fbo_status;
     int viewport[4];
+    int current_program;
+    int scissor_box[4];
+    int active_texture;
+    int texture_2d;
+    int array_buffer;
+    int element_array_buffer;
+    int vertex_array;
+    unsigned char color_mask[4];
+    unsigned char scissor_enabled;
+    unsigned char blend_enabled;
+    unsigned char depth_enabled;
+    unsigned char stencil_enabled;
+    unsigned char cull_enabled;
     unsigned int rgb[9];
     int sample_count;
     int nonblack_samples;
+    int ng_diag_valid;
+    RdNgDiagV1 ng;
 } RdEgltPresentProbe;
 
 static const char* rd_egl_error_name(EGLint error) {
@@ -757,13 +805,25 @@ static void rd_eglt_collect_present_probe(RdEgltPresentProbe* p) {
     memset(p, 0, sizeof(*p));
     p->surface_width = -1;
     p->surface_height = -1;
+    p->client_version = -1;
     p->native_fbo = -1;
+    p->native_read_fbo = -1;
+    p->current_program = -1;
+    p->active_texture = -1;
+    p->texture_2d = -1;
+    p->array_buffer = -1;
+    p->element_array_buffer = -1;
+    p->vertex_array = -1;
     p->viewport[0] = p->viewport[1] = p->viewport[2] = p->viewport[3] = -1;
+    p->scissor_box[0] = p->scissor_box[1] = p->scissor_box[2] = p->scissor_box[3] = -1;
 
     p->current_display = eglGetCurrentDisplay();
     p->current_context = eglGetCurrentContext();
     p->current_draw = eglGetCurrentSurface(EGL_DRAW);
     p->current_read = eglGetCurrentSurface(EGL_READ);
+    if (p->current_display != EGL_NO_DISPLAY && p->current_context != EGL_NO_CONTEXT)
+        eglQueryContext(p->current_display, p->current_context,
+                        EGL_CONTEXT_CLIENT_VERSION, &p->client_version);
     if (g_egl_display && g_egl_surface) {
         eglQuerySurface(g_egl_display, g_egl_surface, EGL_WIDTH, &p->surface_width);
         eglQuerySurface(g_egl_display, g_egl_surface, EGL_HEIGHT, &p->surface_height);
@@ -772,24 +832,57 @@ static void rd_eglt_collect_present_probe(RdEgltPresentProbe* p) {
     if (p->current_context == EGL_NO_CONTEXT) return;
 
     typedef void (*PFN_rdGlGetIntegerv)(unsigned int, int*);
+    typedef void (*PFN_rdGlGetBooleanv)(unsigned int, unsigned char*);
+    typedef unsigned char (*PFN_rdGlIsEnabled)(unsigned int);
     typedef unsigned int (*PFN_rdGlCheckFramebufferStatus)(unsigned int);
     typedef void (*PFN_rdGlReadPixels)(int, int, int, int, unsigned int, unsigned int, void*);
+    typedef int (*PFN_rdNgDiagSnapshot)(void*, size_t);
     static PFN_rdGlGetIntegerv p_get_int = NULL;
+    static PFN_rdGlGetBooleanv p_get_bool = NULL;
+    static PFN_rdGlIsEnabled p_is_enabled = NULL;
     static PFN_rdGlCheckFramebufferStatus p_check_fbo = NULL;
     static PFN_rdGlReadPixels p_read_pixels = NULL;
+    static PFN_rdNgDiagSnapshot p_ng_snapshot = NULL;
     static int resolved = 0;
     if (!resolved) {
         resolved = 1;
         p_get_int = (PFN_rdGlGetIntegerv)pridroid_gles_resolver("glGetIntegerv");
+        p_get_bool = (PFN_rdGlGetBooleanv)pridroid_gles_resolver("glGetBooleanv");
+        p_is_enabled = (PFN_rdGlIsEnabled)pridroid_gles_resolver("glIsEnabled");
         p_check_fbo = (PFN_rdGlCheckFramebufferStatus)
             pridroid_gles_resolver("glCheckFramebufferStatus");
         p_read_pixels = (PFN_rdGlReadPixels)pridroid_gles_resolver("glReadPixels");
+        if (g_glt_handle)
+            p_ng_snapshot = (PFN_rdNgDiagSnapshot)dlsym(g_glt_handle,
+                                                         "pridroid_ng_diag_snapshot_v1");
     }
 
     if (p_get_int) {
-        p_get_int(0x8CA6 /* GL_FRAMEBUFFER_BINDING */, &p->native_fbo);
+        p_get_int(0x8CA6 /* GL_DRAW_FRAMEBUFFER_BINDING */, &p->native_fbo);
+        if (p->client_version >= 3)
+            p_get_int(0x8CAA /* GL_READ_FRAMEBUFFER_BINDING */, &p->native_read_fbo);
         p_get_int(0x0BA2 /* GL_VIEWPORT */, p->viewport);
+        p_get_int(0x8B8D /* GL_CURRENT_PROGRAM */, &p->current_program);
+        p_get_int(0x0C10 /* GL_SCISSOR_BOX */, p->scissor_box);
+        p_get_int(0x84E0 /* GL_ACTIVE_TEXTURE */, &p->active_texture);
+        p_get_int(0x8069 /* GL_TEXTURE_BINDING_2D */, &p->texture_2d);
+        p_get_int(0x8894 /* GL_ARRAY_BUFFER_BINDING */, &p->array_buffer);
+        p_get_int(0x8895 /* GL_ELEMENT_ARRAY_BUFFER_BINDING */, &p->element_array_buffer);
+        if (p->client_version >= 3)
+            p_get_int(0x85B5 /* GL_VERTEX_ARRAY_BINDING */, &p->vertex_array);
     }
+    if (p_get_bool)
+        p_get_bool(0x0C23 /* GL_COLOR_WRITEMASK */, p->color_mask);
+    if (p_is_enabled) {
+        p->scissor_enabled = p_is_enabled(0x0C11 /* GL_SCISSOR_TEST */);
+        p->blend_enabled = p_is_enabled(0x0BE2 /* GL_BLEND */);
+        p->depth_enabled = p_is_enabled(0x0B71 /* GL_DEPTH_TEST */);
+        p->stencil_enabled = p_is_enabled(0x0B90 /* GL_STENCIL_TEST */);
+        p->cull_enabled = p_is_enabled(0x0B44 /* GL_CULL_FACE */);
+    }
+    if (p_ng_snapshot && p_ng_snapshot(&p->ng, sizeof(p->ng)) &&
+        p->ng.abi_version == 1 && p->ng.struct_size == sizeof(p->ng))
+        p->ng_diag_valid = 1;
     if (p_check_fbo)
         p->fbo_status = p_check_fbo(0x8D40 /* GL_FRAMEBUFFER */);
 
@@ -839,6 +932,70 @@ static void rd_eglt_log_present_probe(const RdEgltPresentProbe* p,
          p->sample_count, p->nonblack_samples, black_streak,
          p->rgb[0], p->rgb[1], p->rgb[2], p->rgb[3], p->rgb[4],
          p->rgb[5], p->rgb[6], p->rgb[7], p->rgb[8]);
+
+    static RdNgDiagV1 previous_ng;
+    static int have_previous_ng = 0;
+    uint64_t d_api = 0, d_api_vertices = 0, d_lists = 0;
+    uint64_t d_driver = 0, d_driver_vertices = 0, d_clear = 0, d_blit = 0;
+    uint64_t d_fbo_app = 0, d_fbo_native = 0, d_fbo_skip = 0;
+    if (p->ng_diag_valid) {
+#define RD_DELTA(field) \
+        ((!have_previous_ng || p->ng.field >= previous_ng.field) \
+             ? p->ng.field - (have_previous_ng ? previous_ng.field : 0) \
+             : p->ng.field)
+        d_api = RD_DELTA(api_draw_calls);
+        d_api_vertices = RD_DELTA(api_draw_vertices);
+        d_lists = RD_DELTA(display_list_calls);
+        d_driver = RD_DELTA(driver_draw_calls);
+        d_driver_vertices = RD_DELTA(driver_draw_vertices);
+        d_clear = RD_DELTA(clear_calls);
+        d_blit = RD_DELTA(blit_calls);
+        d_fbo_app = RD_DELTA(fbo_app_binds);
+        d_fbo_native = RD_DELTA(fbo_native_binds);
+        d_fbo_skip = RD_DELTA(fbo_skipped_binds);
+#undef RD_DELTA
+    }
+    LOGI("EGLT draw-state: native[gles=%d draw_fbo=%d read_fbo=%d program=%d viewport=%d,%d,%d,%d "
+         "scissor=%u/%d,%d,%d,%d color_mask=%u%u%u%u blend=%u depth=%u stencil=%u cull=%u "
+         "active_tex=0x%x tex2d=%d vao=%d array=%d element=%d] "
+         "ng[available=%d delta api=%llu/%llu list=%llu driver=%llu/%llu clear=%llu blit=%llu "
+         "fbo=%llu/%llu/%llu total api=%llu list=%llu driver=%llu clear=%llu blit=%llu "
+         "last_mode=0x%x last_clear=0x%x wrapper_valid=%d program=%d fbo=%d/%d "
+         "viewport=%d,%d,%d,%d scissor=%d,%d,%d,%d color_mask=%u%u%u%u "
+         "blend=%u depth=%u stencil=%u cull=%u]",
+         p->client_version, p->native_fbo, p->native_read_fbo, p->current_program,
+         p->viewport[0], p->viewport[1], p->viewport[2], p->viewport[3],
+         p->scissor_enabled, p->scissor_box[0], p->scissor_box[1],
+         p->scissor_box[2], p->scissor_box[3],
+         p->color_mask[0], p->color_mask[1], p->color_mask[2], p->color_mask[3],
+         p->blend_enabled, p->depth_enabled, p->stencil_enabled, p->cull_enabled,
+         p->active_texture, p->texture_2d, p->vertex_array,
+         p->array_buffer, p->element_array_buffer,
+         p->ng_diag_valid,
+         (unsigned long long)d_api, (unsigned long long)d_api_vertices,
+         (unsigned long long)d_lists,
+         (unsigned long long)d_driver, (unsigned long long)d_driver_vertices,
+         (unsigned long long)d_clear, (unsigned long long)d_blit,
+         (unsigned long long)d_fbo_app, (unsigned long long)d_fbo_native,
+         (unsigned long long)d_fbo_skip,
+         (unsigned long long)p->ng.api_draw_calls,
+         (unsigned long long)p->ng.display_list_calls,
+         (unsigned long long)p->ng.driver_draw_calls,
+         (unsigned long long)p->ng.clear_calls, (unsigned long long)p->ng.blit_calls,
+         p->ng.last_draw_mode, p->ng.last_clear_mask, p->ng.wrapper_state_valid,
+         p->ng.wrapper_program, p->ng.wrapper_draw_fbo, p->ng.wrapper_read_fbo,
+         p->ng.wrapper_viewport[0], p->ng.wrapper_viewport[1],
+         p->ng.wrapper_viewport[2], p->ng.wrapper_viewport[3],
+         p->ng.wrapper_scissor[0], p->ng.wrapper_scissor[1],
+         p->ng.wrapper_scissor[2], p->ng.wrapper_scissor[3],
+         p->ng.wrapper_color_mask[0], p->ng.wrapper_color_mask[1],
+         p->ng.wrapper_color_mask[2], p->ng.wrapper_color_mask[3],
+         p->ng.wrapper_blend, p->ng.wrapper_depth_test,
+         p->ng.wrapper_stencil_test, p->ng.wrapper_cull_face);
+    if (p->ng_diag_valid) {
+        previous_ng = p->ng;
+        have_previous_ng = 1;
+    }
 }
 
 // ---- GLX -> EGL-translator bridge helpers (RimWorld 1.6 on MobileGlues/NG) --------
@@ -870,8 +1027,12 @@ void pridroid_eglt_swap(void) {
     static EGLint last_failure_error = EGL_SUCCESS;
     static unsigned int black_streak = 0;
     const uint64_t now = rd_now_ns();
+    // Once a black buffer is observed, tighten the flight recorder to 3 seconds so
+    // deltas describe the failure itself, not a broad 15-second interval.  The normal
+    // path remains deliberately low-frequency.
+    const uint64_t heartbeat_interval_ns = black_streak ? 3000000000ull : 15000000000ull;
     const bool heartbeat_due = !last_heartbeat_ns ||
-        now - last_heartbeat_ns >= 15000000000ull;
+        now - last_heartbeat_ns >= heartbeat_interval_ns;
     RdEgltPresentProbe probe;
     bool have_probe = false;
 
@@ -924,7 +1085,9 @@ void pridroid_eglt_swap(void) {
 
         rd_eglt_log_present_probe(&probe, attempts, successes, failures, ok, error,
                                   black_streak);
-        if (black_streak >= 3 &&
+        if (black_streak == 1) {
+            LOGW("EGLT: native back buffer changed to all-black; enabling 3-second draw/state probes");
+        } else if (black_streak >= 3 &&
             (black_streak == 3 || (black_streak % 4) == 0)) {
             LOGW("EGLT: sustained black native back buffer: %u consecutive 15-second probe(s); "
                  "simulation may still be running", black_streak);
@@ -1409,6 +1572,7 @@ static int pridroid_init_gl4es_egl(ANativeWindow* nativeWindow) {
             LOGI("GLT: dlopen('%s') -> %p%s%s", libgl, h,
                  h ? "" : " FAILED: ", h ? "" : dlerror());
             if (h) {
+                g_glt_handle = h;
                 void (*fSimple)(int) = (void(*)(int))dlsym(h, "updateSimpleShaderConvState");
                 if (fSimple) {
                     fSimple(0);
@@ -1526,6 +1690,7 @@ static int pridroid_init_gl4es_egl(ANativeWindow* nativeWindow) {
         if (gl4es_path && *gl4es_path) {
             void* h = dlopen(gl4es_path, RTLD_LAZY | RTLD_GLOBAL);
             if (h) {
+                g_glt_handle = h;
                 void (*set_gpa)(void* (*)(const char*)) =
                     (void (*)(void* (*)(const char*)))dlsym(h, "set_getprocaddress");
                 if (set_gpa) {
