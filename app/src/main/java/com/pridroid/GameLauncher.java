@@ -120,7 +120,7 @@ public class GameLauncher {
             + "interpreter   : " + (interp ? "ON (dynarec OFF)" : "off") + "\n"
             + "compat mode   : " + (s.isCompatibilityMode() ? "ON (WEAKBARRIER=2 X87DOUBLE=1 MAXCPU=1)" : "off") + "\n"
             + "box64         : DYNAREC=" + (interp ? "0" : "1")
-                + " STRONGMEM=4 BIGBLOCK=0 SAFEFLAGS=1 WEAKBARRIER=" + (s.isCompatibilityMode() ? "2 X87DOUBLE=1 MAXCPU=1" : "1") + "\n"
+                + " STRONGMEM=1 BIGBLOCK=2 SAFEFLAGS=1 WEAKBARRIER=" + (s.isCompatibilityMode() ? "2 X87DOUBLE=1 MAXCPU=1" : "1") + "\n"
             + "extra env     : " + envFieldReport(s) + "\n"
             + "active mods   : " + readActiveMods(gi) + "\n"
             + "(GL_RENDERER / GL_VERSION appear below once GL initialises)\n"
@@ -323,24 +323,17 @@ public class GameLauncher {
         Os.setenv("BOX64_LOG", "0", true);
         Os.setenv("BOX64_SHOWBT", "1", true);
         Os.setenv("BOX64_DYNAREC", "1", true);
-        Os.setenv("BOX64_DYNAREC_BIGBLOCK", "0", true);  // 0 for Unity/Mono JIT
+        // Prison Architect is a native C++ binary, not Unity/Mono JIT. Let box64 build normal
+        // cross-function blocks instead of paying RimWorld's BIGBLOCK=0 JIT/SMC penalty.
+        Os.setenv("BOX64_DYNAREC_BIGBLOCK", "2", true);
         Os.setenv("BOX64_DYNAREC_SAFEFLAGS", "1", true);
-        Os.setenv("BOX64_DYNAREC_STRONGMEM", "4", true);    // QEMU-style strong memory model. Tested on Adreno 830: 4 > 3 > 2 for FPS (more barriers → fewer Mono-GC fault-storms; strictest = also safest for saves). Kept at 4.
-        Os.setenv("BOX64_DYNAREC_WEAKBARRIER", "1", true);  // box64 default; WEAKBARRIER=0 was tested, did NOT fix save corruption
-        // FASTNAN/FASTROUND default to 1 in box64 (imprecise FP). Force OFF: imprecise FP is a known
-        // amplifier of the pawn-save corruption (multiple reports got corruption ONLY after a third-party
-        // AI told them to set these to 1). Precise FP costs a little speed, safety wins.
+        // Level 1 preserves ordering at guest write boundaries without the per-store QEMU-style
+        // barriers of level 4. Keep precise FP for deterministic simulation/save data; optimise the
+        // block shape and memory barriers first, without changing game maths.
+        Os.setenv("BOX64_DYNAREC_STRONGMEM", "1", true);
+        Os.setenv("BOX64_DYNAREC_WEAKBARRIER", "1", true);
         Os.setenv("BOX64_DYNAREC_FASTNAN", "0", true);
         Os.setenv("BOX64_DYNAREC_FASTROUND", "0", true);
-        // TEMPORARY tester experiment (DEBUG builds only): force box64's aligned-atomics CAS path to
-        // test the Mali/Cortex save-corruption hypothesis — Mono's GC CMPXCHG may be hitting box64's
-        // "unaligned atomic" fallback (marked "not enough" in box64 source) → corrupting Pawn objects →
-        // pawns serialize as empty <li/>. Debug-only so the signed release is unaffected. If this fixes
-        // the save bug on the affected device, we make it a proper per-device default. Remove afterwards.
-        // (Ruled out as the softpipe "all-zero buffer" cause — re-enabled for the Mali/Cortex test.)
-        if (BuildConfig.DEBUG) {
-            Os.setenv("BOX64_DYNAREC_ALIGNED_ATOMICS", "1", true);
-        }
         // BOX64_DYNAREC_DIRTY=2 TESTED 2026-06-03 (Adreno 830): REJECTED. FPS collapsed to 12→7 (got WORSE over
         // time, opposite of cold-cache warmup) — NEVERCLEAN hotpages break Mono-JIT SMC handling. Keep default (0).
         // "Interpreter mode" test toggle → disable box64 dynarec entirely (BOX64_DYNAREC=0,
@@ -532,6 +525,14 @@ public class GameLauncher {
                 // applied after this.
                 Os.setenv("PRIDROID_GLT_THREADED", "1", true);
                 Os.setenv("PRIDROID_GLT_NOMIP", "tex", true);
+                // The launcher already owns frame pacing when a cap is selected. On NG, leaving
+                // EGL swap interval 1 enabled as well makes the cap race the display refresh and
+                // can produce periodic long frames. Let the explicit pacer own NG timing; keep
+                // MobileGlues unchanged until it is measured separately.
+                if (paSettings.getFpsCap() > 0 && glTranslator.contains("ng_gl4es"))
+                    Os.setenv("PRIDROID_GLT_NOVSYNC", "1", true);
+                else
+                    Os.unsetenv("PRIDROID_GLT_NOVSYNC");
                 // MobileGlues drops Unity 2019's GL_RED sub-uploads for dynamic font atlases.
                 // Enable the direct GLES replay only on the affected 1.5 SDL path.
                 if (!new java.io.File(gameInstance.getGamePath(), "rd_x11").exists())
@@ -545,6 +546,7 @@ public class GameLauncher {
                 Os.unsetenv("PRIDROID_GLT_DECODE_S3TC");
                 Os.unsetenv("PRIDROID_GLT_ETC2");
                 Os.unsetenv("PRIDROID_GLT_FONTFIX");
+                Os.unsetenv("PRIDROID_GLT_NOVSYNC");
             }
         }
         // The enum name maps 1:1 to the native renderer token parsed in pridroid.c
@@ -554,6 +556,13 @@ public class GameLauncher {
 
         GpuInfo launchGpu = null;
         VulkanDriverPolicy.Decision driverDecision = null;
+
+        // The launcher process can survive a game session. Clear renderer-private state before
+        // applying the selected renderer so a previous Zink run cannot leak into NG/GL4ES.
+        Os.unsetenv("ZINK_DEBUG");
+        Os.unsetenv("ZINK_DESCRIPTORS");
+        Os.unsetenv("MESA_DEBUG");
+        Os.unsetenv("MESA_GLSL");
 
         switch (renderer) {
             case GL4ES:
@@ -647,12 +656,21 @@ public class GameLauncher {
                 Os.setenv("GALLIUM_DRIVER", soft ? "softpipe" : "zink", true);
                 Os.setenv("MESA_GL_VERSION_OVERRIDE", "4.3", true);
                 Os.setenv("MESA_GLSL_VERSION_OVERRIDE", "430", true);
-                // DEBUG: surface Zink/Mesa shader compile/link errors + GL errors
-                // to logcat, to test whether a failing core Unity shader triggers
-                // the GfxDevice device-lost teardown loop (SDL_GL_DeleteContext loop).
-                Os.setenv("MESA_DEBUG", "1", true);          // GL errors + warnings to stderr
-                Os.setenv("MESA_GLSL", "errors", true);      // GLSL compile/link errors
-                if (!soft) Os.setenv("ZINK_DEBUG", "compact", true);    // Zink-level diagnostics
+                // Keep Mesa diagnostics out of normal gameplay: MESA_DEBUG reports GL errors to
+                // stderr and is meant for targeted debugging. ZINK_DEBUG=compact is not logging;
+                // it limits descriptor-set pressure. Mesa documents "lazy" as the descriptor mode
+                // that aims for the least CPU work, which suits PA's many small legacy draws.
+                if (gameInstance.settings().isDebug()) {
+                    Os.setenv("MESA_DEBUG", "1", true);
+                    Os.setenv("MESA_GLSL", "errors", true);
+                } else {
+                    Os.unsetenv("MESA_DEBUG");
+                    Os.unsetenv("MESA_GLSL");
+                }
+                if (!soft) {
+                    Os.setenv("ZINK_DEBUG", "compact", true);
+                    Os.setenv("ZINK_DESCRIPTORS", "lazy", true);
+                }
                 // libzfa.so exports a fixed classic-GL symbol set but is MISSING the
                 // entry points for several advertised extensions (whole DSA family,
                 // internalformat_query, timer_query, sparse_texture, blend_equation_
@@ -846,21 +864,19 @@ public class GameLauncher {
             }
         }
 
-        // Safety clamp: several "save corruption" reports trace to cargo-cult env vars (copied from a
-        // third-party AI) that widen the box64 JIT race — BOX64_DYNAREC_BIGBLOCK>1, FASTNAN=1,
-        // FASTROUND=1, STRONGMEM=0. In RELEASE builds we re-pin these to safe values AFTER the user
-        // field, so a pasted dangerous value can't silently eat colonies. DEBUG builds leave them
-        // untouched so we (devs) can still A/B these knobs.
+        // Release builds keep the tested PA-balanced profile after custom env processing. Debug
+        // builds deliberately remain overridable for controlled A/B runs.
         if (!BuildConfig.DEBUG && rawEnvVars != null) {
             String[][] clamp = {
-                {"BOX64_DYNAREC_BIGBLOCK", "0"}, {"BOX64_DYNAREC_FASTNAN", "0"},
-                {"BOX64_DYNAREC_FASTROUND", "0"}, {"BOX64_DYNAREC_STRONGMEM", "4"}
+                {"BOX64_DYNAREC_BIGBLOCK", "2"}, {"BOX64_DYNAREC_FASTNAN", "0"},
+                {"BOX64_DYNAREC_FASTROUND", "0"}, {"BOX64_DYNAREC_STRONGMEM", "1"}
             };
             for (String[] kv : clamp) {
                 String v = Os.getenv(kv[0]);
                 if (v != null && !v.equals(kv[1])) {
                     Os.setenv(kv[0], kv[1], true);
-                    postLog("Safety: ignored unsafe " + kv[0] + "=" + v + " (forced " + kv[1] + " — protects saves)");
+                    postLog("Profile: ignored release override " + kv[0] + "=" + v
+                            + " (forced PA-balanced " + kv[1] + ")");
                 }
             }
         }
