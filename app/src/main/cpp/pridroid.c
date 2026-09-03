@@ -151,6 +151,11 @@ void* g_egl_display = NULL;   // EGLDisplay
 void* g_egl_surface = NULL;   // EGLSurface
 void* g_egl_context = NULL;   // EGLContext (the PRIMARY; workers share with it — see eglt_create_shared)
 static void* g_egl_config = NULL;   // EGLConfig the surface/contexts were created with
+// Android may destroy and recreate a SurfaceView while the game process remains alive
+// (incoming call, Home, screen lock, external display changes).  EGLSurface is tied to one
+// BufferQueue generation and cannot be reused for the replacement ANativeWindow.
+static uint64_t g_native_window_generation = 0; // protected by g_pridroid_surface.mutex
+static uint64_t g_egl_surface_generation = 0;   // render-thread owned
 
 // ZFA (Zink-for-Android) state for the ZINK_ZFA renderer.  ZFA presents a real
 // desktop OpenGL CORE profile (Mesa Zink over Vulkan/Turnip), which is what
@@ -709,6 +714,82 @@ static EGLBoolean rd_eglSwapBuffers(EGLDisplay d, EGLSurface s) {
     return g_glt_egl.swap ? g_glt_egl.swap(d, s) : eglSwapBuffers(d, s);
 }
 
+static const char* rd_egl_error_name(EGLint error);
+
+// Rebind the existing GL context to the newest Android SurfaceView BufferQueue.  All EGL calls
+// deliberately run on the game's render thread: doing this from SurfaceHolder.Callback (the Java
+// UI thread) would race the current context and can produce EGL_BAD_ACCESS.  Keeping the context
+// preserves the game's textures/programs; only the disposable window surface is replaced.
+static bool rd_eglt_sync_window_surface(void) {
+    ANativeWindow* window = NULL;
+    int width = 0, height = 0;
+    uint64_t generation = 0;
+
+    pthread_mutex_lock(&g_pridroid_surface.mutex);
+    generation = g_native_window_generation;
+    if (generation == g_egl_surface_generation) {
+        pthread_mutex_unlock(&g_pridroid_surface.mutex);
+        return g_egl_surface != EGL_NO_SURFACE;
+    }
+    window = g_pridroid_surface.native_window;
+    width = g_pridroid_surface.width;
+    height = g_pridroid_surface.height;
+    if (window) ANativeWindow_acquire(window); // keep the JNI callback from freeing our snapshot
+    pthread_mutex_unlock(&g_pridroid_surface.mutex);
+
+    if (!window) {
+        static uint64_t last_missing_generation = UINT64_MAX;
+        if (last_missing_generation != generation) {
+            LOGI("EGLT: Android surface unavailable at generation %llu; pausing present until resume",
+                 (unsigned long long)generation);
+            last_missing_generation = generation;
+        }
+        return false;
+    }
+
+    EGLint format = 0;
+    eglGetConfigAttrib(g_egl_display, g_egl_config, EGL_NATIVE_VISUAL_ID, &format);
+    ANativeWindow_setBuffersGeometry(window, 0, 0, format);
+
+    EGLSurface replacement = eglCreateWindowSurface(g_egl_display, g_egl_config, window, NULL);
+    if (replacement == EGL_NO_SURFACE) {
+        EGLint error = eglGetError();
+        LOGE("EGLT: replacement eglCreateWindowSurface failed at generation %llu: 0x%x/%s",
+             (unsigned long long)generation, error, rd_egl_error_name(error));
+        ANativeWindow_release(window);
+        return false;
+    }
+
+    if (!rd_eglMakeCurrent(g_egl_display, replacement, replacement, g_egl_context)) {
+        EGLint error = eglGetError();
+        LOGE("EGLT: replacement eglMakeCurrent failed at generation %llu: 0x%x/%s",
+             (unsigned long long)generation, error, rd_egl_error_name(error));
+        eglDestroySurface(g_egl_display, replacement);
+        ANativeWindow_release(window);
+        return false;
+    }
+
+    EGLSurface previous = g_egl_surface;
+    g_egl_surface = replacement;
+    g_egl_surface_generation = generation;
+    if (previous != EGL_NO_SURFACE && previous != replacement)
+        eglDestroySurface(g_egl_display, previous);
+
+    const char* no_vsync = getenv("PRIDROID_GLT_NOVSYNC");
+    if (no_vsync && no_vsync[0] == '1') eglSwapInterval(g_egl_display, 0);
+
+    pthread_mutex_lock(&g_pridroid_surface.mutex);
+    if (g_native_window_generation == generation)
+        g_pridroid_surface.is_dirty = false;
+    pthread_mutex_unlock(&g_pridroid_surface.mutex);
+
+    LOGI("EGLT: rebound context %p to surface %p generation %llu (%dx%d), old surface %p",
+         g_egl_context, replacement, (unsigned long long)generation,
+         width, height, previous);
+    ANativeWindow_release(window);
+    return true;
+}
+
 // ---- Low-frequency present diagnostics -------------------------------------------------------
 // A long-running Prison Architect session can keep simulating, accepting input and updating the
 // Java FPS counter while the game image is black.  The counter is bumped before this function, so
@@ -1017,7 +1098,8 @@ int pridroid_eglt_release_current(void) {
     return rd_eglMakeCurrent(g_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT) ? 1 : 0;
 }
 void pridroid_eglt_swap(void) {
-    if (!g_egl_display || !g_egl_surface) return;
+    if (!g_egl_display || !g_egl_context) return;
+    if (!rd_eglt_sync_window_surface()) return;
 
     static uint64_t attempts = 0;
     static uint64_t successes = 0;
@@ -1643,6 +1725,11 @@ static int pridroid_init_gl4es_egl(ANativeWindow* nativeWindow) {
     eglGetConfigAttrib(g_egl_display, config, EGL_NATIVE_VISUAL_ID, &format);
     ANativeWindow_setBuffersGeometry(nativeWindow, 0, 0, format);
 
+    uint64_t initial_surface_generation = 0;
+    pthread_mutex_lock(&g_pridroid_surface.mutex);
+    initial_surface_generation = g_native_window_generation;
+    pthread_mutex_unlock(&g_pridroid_surface.mutex);
+
     g_egl_surface = eglCreateWindowSurface(g_egl_display, config, nativeWindow, NULL);
     if (g_egl_surface == EGL_NO_SURFACE) {
         LOGE("EGL: eglCreateWindowSurface failed: 0x%x", eglGetError());
@@ -1668,6 +1755,11 @@ static int pridroid_init_gl4es_egl(ANativeWindow* nativeWindow) {
         LOGE("EGL: eglMakeCurrent failed: 0x%x", eglGetError());
         return -1;
     }
+    g_egl_surface_generation = initial_surface_generation;
+    pthread_mutex_lock(&g_pridroid_surface.mutex);
+    if (g_native_window_generation == initial_surface_generation)
+        g_pridroid_surface.is_dirty = false;
+    pthread_mutex_unlock(&g_pridroid_surface.mutex);
     // PRIDROID_GLT_NOVSYNC=1: present without waiting for the display tick. Diagnostic first
     // (the menu FPS ceiling on MobileGlues read exactly 120 = the S25's refresh rate, masking
     // the path's true throughput vs zink's unthrottled 500-600), possibly a small in-game win
@@ -2563,16 +2655,22 @@ void pridroid_deinit() {
 
 void pridroid_surface_init(ANativeWindow* wnd, int width, int height) {
     pthread_mutex_lock(&g_pridroid_surface.mutex);
-    // Release the previously acquired window before replacing it — repeated surfaceChanged
-    // leaked one ANativeWindow reference per call (kept the old BufferQueue pinned).
-    if (g_pridroid_surface.native_window && g_pridroid_surface.native_window != wnd)
-        ANativeWindow_release(g_pridroid_surface.native_window);
-    g_pridroid_surface.native_window = wnd;
+    // ANativeWindow_fromSurface acquires a reference on every callback. If Android reports the
+    // same native object again, keep our old owned reference and drop the duplicate one.
+    if (g_pridroid_surface.native_window == wnd && wnd) {
+        ANativeWindow_release(wnd);
+    } else {
+        if (g_pridroid_surface.native_window)
+            ANativeWindow_release(g_pridroid_surface.native_window);
+        g_pridroid_surface.native_window = wnd;
+    }
     g_pridroid_surface.width  = width;
     g_pridroid_surface.height = height;
     g_pridroid_surface.is_dirty = true;
+    uint64_t generation = ++g_native_window_generation;
     pthread_mutex_unlock(&g_pridroid_surface.mutex);
-    LOGI("Surface init: %dx%d", width, height);
+    LOGI("Surface init: %dx%d window=%p generation=%llu", width, height, wnd,
+         (unsigned long long)generation);
 }
 
 void pridroid_surface_deinit() {
@@ -2585,5 +2683,10 @@ void pridroid_surface_deinit() {
         ANativeWindow_release(g_pridroid_surface.native_window);
         g_pridroid_surface.native_window = NULL;
     }
+    g_pridroid_surface.width = 0;
+    g_pridroid_surface.height = 0;
+    g_pridroid_surface.is_dirty = true;
+    uint64_t generation = ++g_native_window_generation;
     pthread_mutex_unlock(&g_pridroid_surface.mutex);
+    LOGI("Surface deinit: generation=%llu", (unsigned long long)generation);
 }
