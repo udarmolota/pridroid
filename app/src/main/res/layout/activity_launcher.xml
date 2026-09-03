@@ -57,7 +57,7 @@
             android:layout_height="1dp"
             android:background="?attr/colorPrimary"/>
 
-        <!-- Bottom link row: GitHub / X / Reddit / Donate / Zomdroid. Each is a labelled column of
+        <!-- Bottom link row: GitHub / RimDroid / Reddit / Donate / Zomdroid. Each is a labelled column of
              equal weight, so the captions decide the spacing and the glyphs are self-explanatory
              (an unlabelled heart read as "favourite", an unlabelled Zomdroid glyph as nothing at
              all). Zomdroid is a cross-promo: same author, sibling launcher for Project Zomboid. -->
@@ -113,20 +113,22 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
+                <!-- Keep the full-colour sibling-launcher logo recognisable; tinting would turn it
+                     into an unreadable silhouette. -->
                 <ImageButton
-                    android:id="@+id/link_x"
+                    android:id="@+id/link_rimdroid"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:layout_gravity="center_horizontal"
+                    android:padding="8dp"
                     android:scaleType="centerInside"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_x"
-                    android:tint="?attr/colorOnSurfaceVariant"
-                    android:contentDescription="@string/link_x"/>
+                    android:src="@drawable/ic_rimdroid"
+                    android:contentDescription="@string/nav_label_rimdroid"/>
 
                 <TextView
                     style="@style/AppTheme.NavBottomLabel"
-                    android:text="@string/nav_label_x"/>
+                    android:text="@string/nav_label_rimdroid"/>
             </LinearLayout>
 
             <LinearLayout

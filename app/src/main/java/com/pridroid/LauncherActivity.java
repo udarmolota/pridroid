@@ -171,7 +171,7 @@ public class LauncherActivity extends AppCompatActivity {
                 chooseInstanceForReport();
                 return true;
             }
-            // GitHub / X / Reddit / Support are no longer menu rows — they're the icon row in the
+            // GitHub / RimDroid / Reddit / Support are no longer menu rows — they're the icon row in the
             // drawer header, wired in wireHeaderLinks().
             // "Manage storage" is gone from the drawer: every instance card already has it in its own
             // menu, scoped to that instance (LauncherFragment.openInstanceStorage), so the global copy
@@ -192,13 +192,29 @@ public class LauncherActivity extends AppCompatActivity {
         outState.putStringArray(STATE_PENDING_PARTS, pendingDataParts);
     }
 
-    /** The four external links pinned at the bottom of the drawer (icon row, not menu rows). */
+    /** External links pinned at the bottom of the drawer (icon row, not menu rows). */
     private void wireHeaderLinks() {
         findViewById(R.id.link_github).setOnClickListener(v -> { binding.drawerLayout.close(); checkForUpdates(); });
-        findViewById(R.id.link_x).setOnClickListener(v -> openLink(R.string.url_x));
+        findViewById(R.id.link_rimdroid).setOnClickListener(v -> { binding.drawerLayout.close(); showRimDroidDialog(); });
         findViewById(R.id.link_reddit).setOnClickListener(v -> openLink(R.string.url_reddit_sub));
         findViewById(R.id.link_support).setOnClickListener(v -> { binding.drawerLayout.close(); showDonateDialog(); });
         findViewById(R.id.link_zomdroid).setOnClickListener(v -> { binding.drawerLayout.close(); showZomdroidDialog(); });
+    }
+
+    /** Cross-promo dialog for RimDroid (sibling launcher, same author). Link is clickable. */
+    private void showRimDroidDialog() {
+        android.text.SpannableString s =
+                new android.text.SpannableString(getString(R.string.rimdroid_dialog_message));
+        android.text.util.Linkify.addLinks(s, android.text.util.Linkify.WEB_URLS);
+        androidx.appcompat.app.AlertDialog dialog =
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.nav_label_rimdroid)
+                        .setMessage(s)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .create();
+        dialog.show();
+        TextView mv = dialog.findViewById(android.R.id.message);
+        if (mv != null) mv.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
     }
 
     /** Cross-promo dialog for Zomdroid (sibling launcher, same author). Link is clickable. */

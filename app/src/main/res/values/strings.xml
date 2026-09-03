@@ -110,17 +110,18 @@ In the cloud: %2$s
     <string name="nav_updates">New versions (GitHub)</string>
     <string name="nav_bug_report">Report a bug</string>
     <!-- Drawer footer icon labels (accessibility) -->
-    <string name="link_x">PriDroid on X</string>
     <string name="link_reddit">PriDroid on Reddit</string>
     <string name="link_support">Support the developer</string>
     <string name="link_soon">Coming soon</string>
     <!-- Captions shown under each drawer-footer icon. Brand names stay untranslated. -->
     <string name="nav_label_github" translatable="false">GitHub</string>
-    <string name="nav_label_x" translatable="false">X</string>
+    <string name="nav_label_rimdroid" translatable="false">RimDroid</string>
     <string name="nav_label_reddit" translatable="false">Reddit</string>
     <string name="nav_label_donate">Donate</string>
     <string name="nav_label_zomdroid" translatable="false">Zomdroid</string>
-    <!-- Cross-promo dialog for the sibling launcher. -->
+    <!-- Cross-promo dialogs for sibling launchers. -->
+    <string name="rimdroid_dialog_message">RimDroid runs RimWorld on Android, just as PriDroid runs Prison Architect. Same author, same approach.\n\nhttps://github.com/udarmolota/RimDroid/releases</string>
+    <string name="rimdroid_url" translatable="false">https://github.com/udarmolota/RimDroid/releases</string>
     <string name="zomdroid_dialog_message">Zomdroid runs Project Zomboid on Android, just as PriDroid runs Prison Architect. Same author, same approach.\n\nhttps://github.com/udarmolota/Zomdroid/releases</string>
     <string name="zomdroid_url" translatable="false">https://github.com/udarmolota/Zomdroid/releases</string>
     <!-- Bug report email. Number = the tap date as ddMMyyyy, filled at runtime. -->
@@ -133,9 +134,8 @@ In the cloud: %2$s
     <!-- Support dialog (heart icon). ko-fi link is made clickable at runtime. -->
     <string name="donate_title">Support development</string>
     <string name="donate_message">Enjoying PriDroid and want to support it?\n\nMade and maintained by: ko-fi.com/udarmolota\n\nEvery bit helps keep the work going. Thank you! ❤</string>
-    <!-- External links. url_x carries what url_reddit used to. -->
+    <!-- External links. -->
     <string name="url_github_releases" translatable="false">https://github.com/udarmolota/pridroid/releases</string>
-    <string name="url_x" translatable="false">https://x.com/pridroid</string>
     <string name="url_reddit_sub" translatable="false">https://www.reddit.com/r/pridroid/</string>
     <string name="on_screen_controls">On-screen controls</string>
     <string name="edit_controls">Edit on-screen controls…</string>

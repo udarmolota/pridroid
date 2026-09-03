@@ -103,7 +103,6 @@ Na nuvem: %2$s
     <string name="nav_updates">Novas versões (GitHub)</string>
     <string name="nav_bug_report">Relatar um problema</string>
     <!-- Drawer footer icon labels (accessibility) -->
-    <string name="link_x">PriDroid no X</string>
     <string name="link_reddit">PriDroid no Reddit</string>
     <string name="link_support">Apoiar o desenvolvedor</string>
     <string name="link_soon">Em breve</string>
