@@ -64,8 +64,17 @@ static void XInputStream_destroy(XInputStream* inputStream) {
     MEMFREE(inputStream);
 }
 
+// A negative `remaining` would reach read() as a huge size_t and bionic's FORTIFY check aborts the
+// process outright rather than returning an error. The buffer bookkeeping is not supposed to get
+// there, so treat it as a failed read and let the caller recover.
 static int XInputStream_read(XInputStream* inputStream) {
     int remaining = inputStream->buffer.limit - inputStream->buffer.position;
+    if (remaining <= 0) {
+        println("PriDroid/xinput: read skipped, buffer remaining=%d (pos=%d limit=%d cap=%d)",
+                remaining, inputStream->buffer.position, inputStream->buffer.limit,
+                inputStream->buffer.capacity);
+        return -1;
+    }
     int bytesRead = read(inputStream->fd, inputStream->buffer.data + inputStream->buffer.position, remaining);
     if (bytesRead > 0) {
         inputStream->buffer.position += bytesRead;
@@ -76,6 +85,12 @@ static int XInputStream_read(XInputStream* inputStream) {
 
 static int XInputStream_recvmsg(XInputStream* inputStream) {
     int remaining = inputStream->buffer.limit - inputStream->buffer.position;
+    if (remaining <= 0) {
+        println("PriDroid/xinput: recvmsg skipped, buffer remaining=%d (pos=%d limit=%d cap=%d)",
+                remaining, inputStream->buffer.position, inputStream->buffer.limit,
+                inputStream->buffer.capacity);
+        return -1;
+    }
     int numFds = 0;
     int bytesRead = recv_fds(inputStream->fd, ancillaryFds, &numFds, inputStream->buffer.data + inputStream->buffer.position, remaining);
     if (bytesRead > 0) {
