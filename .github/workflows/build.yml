@@ -34,6 +34,12 @@ jobs:
     
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # The action's default package list still asks for the legacy "tools" package, which
+          # Google removed from the SDK repository in September 2026; cmdline-tools then treats the
+          # missing package as fatal and the whole job dies at setup. Everything else this build
+          # needs (NDK, CMake) is installed by the next step, so platform-tools alone is enough.
+          packages: platform-tools
 
       - name: Install NDK
         run: |
