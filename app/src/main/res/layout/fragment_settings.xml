@@ -470,14 +470,18 @@
               android:layout_marginTop="4dp"
               android:layout_marginBottom="4dp" />
 
+          <!-- Compatibility mode: WEAKBARRIER=2 + X87DOUBLE=1 (and MAXCPU=1). Hidden during the port
+               because its RimWorld rationale was Mono-specific, but the knobs themselves are generic
+               box64 dynarec-correctness levers - and field reports show devices that need them, e.g.
+               an Exynos 9825 where the guest jumps into its own data section and box64 aborts. It is
+               the only lever a player has when the game dies before the first frame. -->
           <Switch
               android:id="@+id/sw_compat_mode"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:layout_marginTop="16dp"
               android:textSize="14sp"
-              android:text="@string/compat_mode_label"
-              android:visibility="gone" />
+              android:text="@string/compat_mode_label" />
 
           <TextView
               android:layout_width="match_parent"
@@ -485,8 +489,7 @@
               android:layout_marginTop="2dp"
               android:textAppearance="?attr/textAppearanceBodySmall"
               android:alpha="0.7"
-              android:text="@string/compat_mode_hint"
-              android:visibility="gone" />
+              android:text="@string/compat_mode_hint" />
 
           <!-- Hidden dev/diagnostic elements — kept so SettingsFragment.findViewById() still resolves
                them (set GONE in code). Do not remove. -->

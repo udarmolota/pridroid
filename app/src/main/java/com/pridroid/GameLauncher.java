@@ -289,7 +289,8 @@ public class GameLauncher {
         if (paSettings.getRenderer() != LauncherPreferences.Renderer.NG_GL4ES)
             paSettings.setRenderer(LauncherPreferences.Renderer.ZINK_ZFA);
         paSettings.setInterpreter(false);
-        paSettings.setCompatibilityMode(false);
+        // Compatibility mode is the player's own choice again (see SettingsFragment) - it is the only
+        // lever left when the game dies before the first frame, as on the Exynos 9825 report.
         // The quality selector is hidden (see fragment_settings.xml): pin the tier so a stored
         // "Low" from an old build cannot keep launching the touch-breaking -safemode invisibly.
         paSettings.setTexTier(InstanceSettings.TEX_NONE);

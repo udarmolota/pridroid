@@ -93,9 +93,12 @@ public class SettingsFragment extends Fragment {
         // Takes effect on the next launch (orientation is requested once in GameActivity.onCreate).
         swReverse.setChecked(inst.isReverseLandscape());
         swReverse.setOnCheckedChangeListener((btn, checked) -> inst.setReverseLandscape(checked));
-        // This switch was a RimWorld/Mono workaround and is not a PA compatibility control.
-        inst.setCompatibilityMode(false);
-        swCompat.setChecked(false);
+        // Compatibility mode. Pinned off during the port on the grounds that its RimWorld rationale
+        // was Mono-specific; the knobs it actually sets (WEAKBARRIER=2, X87DOUBLE=1) are generic
+        // box64 dynarec-correctness levers, and crash reports arrived from devices that need one -
+        // so it is a real setting again. Default stays off: it costs speed and most devices are fine.
+        swCompat.setChecked(inst.isCompatibilityMode());
+        swCompat.setOnCheckedChangeListener((btn, checked) -> inst.setCompatibilityMode(checked));
         swHaptic.setChecked(inst.isHapticFeedback());
         swHaptic.setOnCheckedChangeListener((btn, checked) -> inst.setHapticFeedback(checked));
         // FPS overlay ("FPS: XX", top-left) — GLOBAL. Shows the true presented frame rate; helps
