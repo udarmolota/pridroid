@@ -9,4 +9,13 @@
         android:icon="@drawable/mt_icon_add"
         android:title="@string/nav_new_instance"
         app:showAsAction="always" />
+
+    <!-- The wiki, opened at the section for whichever screen this is pressed on
+         (LauncherActivity.wikiSectionFor). Shown everywhere except the wiki itself. -->
+    <item
+        android:id="@+id/action_wiki_help"
+        android:icon="@drawable/mt_icon_help_toolbar"
+        android:title="@string/nav_wiki"
+        app:iconTint="?attr/colorOnSurfaceVariant"
+        app:showAsAction="always" />
 </menu>

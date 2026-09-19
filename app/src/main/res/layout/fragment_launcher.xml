@@ -28,15 +28,55 @@
                 android:nestedScrollingEnabled="false"
                 android:layout_marginBottom="8dp" />
 
-            <TextView
-                android:id="@+id/tv_no_instances"
+            <!-- Shown only while there is no instance yet: what to do first, and the two routes
+                 that are otherwise buried in the drawer. A first-run screen that says only "no
+                 instances" tells someone what is missing but not how to fix it. -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/launcher_empty_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/no_instances"
-                android:gravity="center"
-                android:padding="12dp"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:visibility="gone" />
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                app:cardCornerRadius="12dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/launcher_empty_title"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:lineSpacingMultiplier="1.2"
+                        android:text="@string/launcher_empty_guide"
+                        android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_empty_gog"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/launcher_empty_gog" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_empty_quick_start"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/launcher_empty_quick_start" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Log header row (sits right under the instances list) -->
             <LinearLayout

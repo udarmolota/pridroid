@@ -7,6 +7,11 @@
     <string name="stop">Detener</string>
     <string name="install_instance">Instalar instancia (ZIP)…</string>
     <string name="no_instances">No hay instancias instaladas</string>
+    <!-- Getting-started card on the launcher screen, shown while no instance exists yet. -->
+    <string name="launcher_empty_title">Cómo empezar</string>
+    <string name="launcher_empty_guide">PriDroid ejecuta la versión de Linux de Prison Architect: el juego no está incluido. Se vende en tiendas como GOG. Si tu copia está allí, inicia sesión para descargarla aquí mismo; en los demás casos, copia el instalador o el archivo de Linux al dispositivo y eliégelo en «Add game instance». La guía de inicio rápido explica ambas opciones.</string>
+    <string name="launcher_empty_gog">Descargar desde GOG</string>
+    <string name="launcher_empty_quick_start">Guía de inicio rápido</string>
     <string name="choose_instance_prompt">— Elige una instancia —</string>
     <string name="choose_instance_first">Elige la instancia donde instalar</string>
     <string name="incomplete_game_title">Archivos del juego incompletos</string>
@@ -90,14 +95,14 @@ En la nube: %2$s
     <string name="driver_recommend_result">GPU: %1$s → %2$s</string>
     <string name="driver_auto_set_title">Controlador recomendado aplicado</string>
     <string name="driver_auto_set">GPU detectada: %1$s.\n\nSe aplicó el controlador Vulkan recomendado para esta instancia: %2$s.\n\nSi ves una pantalla negra o artefactos, cámbialo en los ajustes de la instancia (el icono de engranaje en su tarjeta).</string>
-    <string name="nav_import_mods">Importar mods (ZIP)…</string>
+    <string name="nav_import_mods">Importar mods (ZIP)</string>
     <string name="nav_export_saves">Exportar partidas</string>
     <string name="nav_import_saves">Importar partidas</string>
     <string name="nav_export_settings">Exportar ajustes del juego</string>
     <string name="nav_import_settings">Importar ajustes del juego</string>
-    <string name="nav_export_logs">Exportar registros (ZIP)…</string>
-    <string name="nav_export_layout">Exportar diseño de controles…</string>
-    <string name="nav_import_layout">Importar diseño de controles…</string>
+    <string name="nav_export_logs">Exportar registros (ZIP)</string>
+    <string name="nav_export_layout">Exportar diseño de controles</string>
+    <string name="nav_import_layout">Importar diseño de controles</string>
     <string name="nav_updates">Nuevas versiones (GitHub)</string>
     <string name="nav_bug_report">Reportar un error</string>
     <!-- Drawer footer icon labels (accessibility) -->
@@ -139,13 +144,13 @@ En la nube: %2$s
     <string name="custom_driver_removed">Controlador personalizado eliminado</string>
     <string name="nav_new_instance">Añadir instancia del juego</string>
     <string name="nav_download_game">Descargas de Steam</string>
-    <string name="nav_install_content">Instalar mod / DLC (ZIP)…</string>
-    <string name="nav_custom_driver">Controlador Vulkan personalizado…</string>
-    <string name="install_content_note">Elige un .zip (mod o DLC de GOG), selecciona la instancia y el tipo, y pulsa Instalar. Los mods de Prison Architect se detectan mediante manifest.txt y se instalan en la carpeta de mods de la instancia.</string>
+    <string name="nav_install_content">Instalar mod / DLC (ZIP)</string>
+    <string name="nav_custom_driver">Controlador Vulkan personalizado</string>
+    <string name="install_content_note">Elige un .zip (mod o DLC de GOG), selecciona la instancia y el tipo, y pulsa Instalar.</string>
     <string name="install_content_instance">Instalar en la instancia</string>
     <string name="install_content_type">Tipo</string>
-    <string name="install_content_mod">Mod → .Prison Architect/mods/</string>
-    <string name="install_content_dlc">DLC → Data/</string>
+    <string name="install_content_mod">MODS</string>
+    <string name="install_content_dlc">DLC</string>
     <string name="install_content_pick">Elegir archivo ZIP…</string>
     <string name="install_content_no_file">Ningún archivo seleccionado</string>
     <string name="install_content_go">Instalar</string>
@@ -241,4 +246,37 @@ En la nube: %2$s
     <string name="uiscale_label">Escala de la interfaz</string>
     <string name="uiscale_hint">Amplía la interfaz y las fuentes propias de Prison Architect: el juego no ofrece ese ajuste. Funciona junto con la resolución de renderizado: si sube ambas en la misma proporción, la interfaz conserva su tamaño pero se ve más nítida.</string>
     <string name="ng_gl4es_label">NG-GL4ES (GL sobre GLES — para Mali y otras GPU que no sean Adreno)</string>
+    <!-- GOG download -->
+    <string name="nav_gog_login">Iniciar sesión en GOG</string>
+    <string name="gog_login_note">Inicia sesión con tu correo y contraseña de GOG. El acceso mediante una cuenta vinculada no se completa dentro de una app — si sueles entrar así, establece antes una contraseña: gog.com → Iniciar sesión → Restablecer contraseña.</string>
+    <string name="gog_disclaimer_title">Aviso</string>
+    <string name="gog_disclaimer_text">PriDroid nunca ve tu contraseña: la escribes en la página del propio GOG. El token de acceso solo se guarda en memoria y desaparece al cerrar la app; las cookies de sesión quedan en el almacenamiento privado de esta app para no preguntarte cada vez, y cerrar sesión borra ambas cosas.</string>
+    <string name="gog_login_finishing">Completando el inicio de sesión…</string>
+    <string name="gog_login_ok">Sesión iniciada en GOG</string>
+    <string name="gog_login_failed">Fallo al iniciar sesión: %1$s</string>
+    <string name="gog_user_id">ID de usuario: %1$s</string>
+    <string name="gog_check_library">Consultar biblioteca</string>
+    <string name="gog_sign_out">Cerrar sesión</string>
+    <string name="gog_checking">Leyendo la biblioteca…</string>
+    <string name="gog_probe_owned">%1$d productos en la cuenta</string>
+    <string name="gog_probe_failed">Fallo al consultar la biblioteca: %1$s</string>
+    <string name="gog_download">Descargar</string>
+    <string name="gog_needs_all_files">Las descargas van a la carpeta pública Download/PriDroid, que necesita acceso a todos los archivos. Concédelo e inténtalo de nuevo.</string>
+    <string name="gog_saved_to">Guardado en Download/PriDroid/%1$s\n\nYa puedes crear una instancia a partir de él — el archivo se queda ahí, así que podrás reinstalar más tarde sin volver a descargarlo.</string>
+    <string name="gog_create_instance">Crear una instancia</string>
+    <string name="gog_scanning">Consultando tu biblioteca — %1$d de %2$d</string>
+    <string name="gog_no_game">No hay Prison Architect en esta cuenta — se muestran todos los juegos con instalador para Linux.</string>
+    <string name="gog_nothing_linux">Ningún juego de esta cuenta tiene instalador para Linux.</string>
+    <string name="gog_item_installer">%1$s · %2$s</string>
+    <string name="gog_keepalive">Descargando de GOG — puedes cambiar a otras apps</string>
+    <string name="gog_download_interrupted">La descarga se interrumpió. Pulsa “%1$s” de nuevo para continuar.</string>
+    <string name="gog_download_failed">Fallo en la descarga: %1$s</string>
+    <string name="gog_queued">En cola</string>
+    <string name="gog_downloading">Descargando…</string>
+    <string name="gog_percent">%1$d%%</string>
+    <string name="gog_install_dlc">Instalar</string>
+    <string name="gog_item_dlc">DLC · %1$s</string>
+    <string name="new_instance_with_dlc">%1$s + %2$d DLC</string>
+    <string name="gog_item_game">JUEGO · %1$s</string>
+    <string name="nav_wiki">Wiki</string>
 </resources>

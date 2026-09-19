@@ -48,7 +48,7 @@ public class LauncherFragment extends Fragment {
     private static final int MAX_LOG_LINES = 500;
 
     private RecyclerView rvInstances;
-    private TextView tvNoInstances;
+    private View emptyCard;
     private volatile String pendingInstallName;   // ZIP instance being installed → GPU driver advisor
     private Button btnClearLog;
     private TextView tvLog;
@@ -75,7 +75,14 @@ public class LauncherFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         rvInstances        = view.findViewById(R.id.rv_instances);
-        tvNoInstances      = view.findViewById(R.id.tv_no_instances);
+        emptyCard          = view.findViewById(R.id.launcher_empty_card);
+        // The empty-state card: the wiki's quick start, and the GOG download that is otherwise
+        // only reachable from the drawer.
+        view.findViewById(R.id.btn_empty_quick_start).setOnClickListener(v ->
+                androidx.navigation.Navigation.findNavController(v).navigate(R.id.action_open_wiki,
+                        com.pridroid.fragments.WikiFragment.section("quick-start")));
+        view.findViewById(R.id.btn_empty_gog).setOnClickListener(v ->
+                androidx.navigation.Navigation.findNavController(v).navigate(R.id.action_gog_login));
         btnClearLog        = view.findViewById(R.id.btn_clear_log);
         tvLog              = view.findViewById(R.id.tv_log);
         scrollLog          = view.findViewById(R.id.scroll_log);
@@ -129,9 +136,8 @@ public class LauncherFragment extends Fragment {
         instances.clear();
         instances.addAll(GameInstanceManager.requireSingleton().getInstances());
         if (instanceAdapter != null) instanceAdapter.notifyDataSetChanged();
-        if (tvNoInstances != null) {
-            tvNoInstances.setVisibility(instances.isEmpty() ? View.VISIBLE : View.GONE);
-        }
+        if (emptyCard != null)
+            emptyCard.setVisibility(instances.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     /** One card per instance: name + a settings (gear) button + a Launch button. */

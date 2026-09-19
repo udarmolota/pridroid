@@ -133,6 +133,9 @@ public class LauncherActivity extends AppCompatActivity {
             } else if (id == R.id.action_custom_driver) {
                 navController.navigate(R.id.action_open_custom_driver);   // device-global custom Vulkan driver import
                 return true;
+            } else if (id == R.id.action_gog_login) {
+                navController.navigate(R.id.action_gog_login);   // GOG sign-in (WebView) — see GogAuth
+                return true;
             } else if (id == R.id.action_export_saves) {
                 chooseInstanceThen(gi -> { pendingInstance = gi;
                         pendingDataParts = new String[]{ GameDataTransfer.SAVES };
@@ -195,10 +198,13 @@ public class LauncherActivity extends AppCompatActivity {
     /** External links pinned at the bottom of the drawer (icon row, not menu rows). */
     private void wireHeaderLinks() {
         findViewById(R.id.link_github).setOnClickListener(v -> { binding.drawerLayout.close(); checkForUpdates(); });
+        findViewById(R.id.link_wiki).setOnClickListener(v -> {
+            binding.drawerLayout.close();
+            navController.navigate(R.id.action_open_wiki);
+        });
         findViewById(R.id.link_rimdroid).setOnClickListener(v -> { binding.drawerLayout.close(); showRimDroidDialog(); });
         findViewById(R.id.link_reddit).setOnClickListener(v -> openLink(R.string.url_reddit_sub));
         findViewById(R.id.link_support).setOnClickListener(v -> { binding.drawerLayout.close(); showDonateDialog(); });
-        findViewById(R.id.link_zomdroid).setOnClickListener(v -> { binding.drawerLayout.close(); showZomdroidDialog(); });
     }
 
     /** Cross-promo dialog for RimDroid (sibling launcher, same author). Link is clickable. */
@@ -403,13 +409,38 @@ public class LauncherActivity extends AppCompatActivity {
                     && navController.getCurrentDestination() != null
                     && navController.getCurrentDestination().getId() == R.id.launcher_fragment);
         }
+        // The "?" is on every screen except the wiki itself.
+        MenuItem help = menu.findItem(R.id.action_wiki_help);
+        if (help != null) help.setVisible(currentDestinationId() != 0
+                && currentDestinationId() != R.id.wiki_fragment);
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private int currentDestinationId() {
+        return navController != null && navController.getCurrentDestination() != null
+                ? navController.getCurrentDestination().getId() : 0;
+    }
+
+    /** The wiki section that explains the screen the "?" was pressed on. */
+    private static String wikiSectionFor(int destinationId) {
+        if (destinationId == R.id.new_instance_fragment)    return "get-game";
+        if (destinationId == R.id.gog_login_fragment)       return "gog";
+        if (destinationId == R.id.download_fragment)        return "mods";
+        if (destinationId == R.id.install_content_fragment) return "mods";
+        if (destinationId == R.id.settings_fragment
+                || destinationId == R.id.driver_fragment)   return "renderers";
+        return "quick-start";   // the main screen, app settings, and any screen added later
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_install_instance) {
             navController.navigate(R.id.action_install_instance);   // global action -> new_instance_fragment
+            return true;
+        }
+        if (item.getItemId() == R.id.action_wiki_help) {
+            navController.navigate(R.id.action_open_wiki,
+                    com.pridroid.fragments.WikiFragment.section(wikiSectionFor(currentDestinationId())));
             return true;
         }
         return NavigationUI.onNavDestinationSelected(item, navController)

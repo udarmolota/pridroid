@@ -9,10 +9,17 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
-    <!-- Drawer: brand-coloured dividers between menu groups. -->
+    <!-- Drawer: brand-coloured dividers between menu groups, and a tighter row than Material's
+         default - one text step down and 7dp less breathing room at each edge, so the whole menu
+         fits the panel without wrapping a title. -->
     <style name="AppTheme.NavigationView" parent="Widget.Material3.NavigationView">
         <item name="dividerColor">@color/rd_primary</item>
+        <item name="itemTextAppearance">@style/AppTheme.NavigationView.Item</item>
+        <item name="itemHorizontalPadding">21dp</item>
     </style>
+
+    <!-- LabelLarge is Material's drawer default (14sp); one step down is LabelMedium. -->
+    <style name="AppTheme.NavigationView.Item" parent="TextAppearance.Material3.LabelMedium" />
 
     <!-- Borderless, tinted 48dp icon button (e.g. the instance-card gear). -->
     <style name="AppTheme.ImageButton">

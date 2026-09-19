@@ -42,6 +42,8 @@ public class InstallerService extends Service {
     public static final String EXTRA_TASK          = "task";
     public static final String EXTRA_ZIP_PATH      = "zip_path";
     public static final String EXTRA_INSTANCE_NAME = "instance_name";
+    /** Optional String[]: GOG expansion installers to extract into the new instance after the game. */
+    public static final String EXTRA_EXTRA_INSTALLERS = "extra_installers";
 
     // Broadcasts
     public static final String BROADCAST_PROGRESS = "com.pridroid.INSTALL_PROGRESS";
@@ -81,7 +83,8 @@ public class InstallerService extends Service {
                     case TASK_INSTALL_INSTANCE: {
                         String zipPath      = intent.getStringExtra(EXTRA_ZIP_PATH);
                         String instanceName = intent.getStringExtra(EXTRA_INSTANCE_NAME);
-                        installInstance(zipPath, instanceName);
+                        String[] extras     = intent.getStringArrayExtra(EXTRA_EXTRA_INSTALLERS);
+                        installInstance(zipPath, instanceName, extras);
                         break;
                     }
                     case TASK_INSTALL_DEPS:
@@ -107,7 +110,8 @@ public class InstallerService extends Service {
     // INSTALL INSTANCE FROM ZIP
     // =========================================================================
 
-    private void installInstance(String zipPath, String instanceName) throws Exception {
+    private void installInstance(String zipPath, String instanceName, String[] extraInstallers)
+            throws Exception {
         if (zipPath == null)      throw new Exception("No zip path");
         if (instanceName == null || instanceName.isEmpty()) throw new Exception("No instance name");
 
@@ -174,6 +178,27 @@ public class InstallerService extends Service {
             bin = new File(instanceDir, C.files.GAME_BIN);
         }
         bin.setExecutable(true);
+
+        // Expansion installers handed over with the game (the GOG downloader sends every DLC already
+        // on the phone). Their payload is game-relative, so they go into the instance root now that
+        // the game is in place - the same thing the install screen does for an existing instance. A
+        // broken one fails the whole install and removes the instance: a half-extracted DLC would
+        // break the game in ways far harder to trace.
+        if (extraInstallers != null) {
+            for (String path : extraInstallers) {
+                java.io.File dlc = new java.io.File(path);
+                try {
+                    if (!dlc.isFile()) throw new java.io.IOException("file not found");
+                    broadcastProgress("Adding " + dlc.getName() + "...");
+                    GogInstallerExtractor.extract(dlc, instanceDir,
+                            new java.io.File(storage.getCachePath()), this::broadcastProgress);
+                } catch (Exception e) {
+                    deleteDir(instanceDir);
+                    throw new Exception("Could not add " + dlc.getName() + ": " + e.getMessage()
+                            + ". Nothing was installed.");
+                }
+            }
+        }
 
         // One-time load-time optimization: the GOG .dat archives are solid RARs that the game
         // unpacks with its embedded unrar on EVERY launch (~46 s under box64 on a Snapdragon
@@ -424,10 +449,18 @@ public class InstallerService extends Service {
     // =========================================================================
 
     public static void startInstallInstance(Context ctx, String zipPath, String instanceName) {
+        startInstallInstance(ctx, zipPath, instanceName, null);
+    }
+
+    /** @param extraInstallers GOG expansion installers to add after the game; null or empty for none. */
+    public static void startInstallInstance(Context ctx, String zipPath, String instanceName,
+                                            String[] extraInstallers) {
         Intent i = new Intent(ctx, InstallerService.class);
         i.putExtra(EXTRA_TASK, TASK_INSTALL_INSTANCE);
         i.putExtra(EXTRA_ZIP_PATH, zipPath);
         i.putExtra(EXTRA_INSTANCE_NAME, instanceName);
+        if (extraInstallers != null && extraInstallers.length > 0)
+            i.putExtra(EXTRA_EXTRA_INSTALLERS, extraInstallers);
         ctx.startForegroundService(i);
     }
 

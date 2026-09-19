@@ -57,7 +57,7 @@
             android:layout_height="1dp"
             android:background="?attr/colorPrimary"/>
 
-        <!-- Bottom link row: GitHub / RimDroid / Reddit / Donate / Zomdroid. Each is a labelled column of
+        <!-- Bottom link row: GitHub / Wiki / Reddit / Donate / RimDroid. Each is a labelled column of
              equal weight, so the captions decide the spacing and the glyphs are self-explanatory
              (an unlabelled heart read as "favourite", an unlabelled Zomdroid glyph as nothing at
              all). Zomdroid is a cross-promo: same author, sibling launcher for Project Zomboid. -->
@@ -113,22 +113,20 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Keep the full-colour sibling-launcher logo recognisable; tinting would turn it
-                     into an unreadable silhouette. -->
                 <ImageButton
-                    android:id="@+id/link_rimdroid"
+                    android:id="@+id/link_wiki"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:layout_gravity="center_horizontal"
-                    android:padding="8dp"
                     android:scaleType="centerInside"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_rimdroid"
-                    android:contentDescription="@string/nav_label_rimdroid"/>
+                    android:src="@drawable/mt_icon_menu_book"
+                    android:tint="?attr/colorOnSurfaceVariant"
+                    android:contentDescription="@string/nav_wiki"/>
 
                 <TextView
                     style="@style/AppTheme.NavBottomLabel"
-                    android:text="@string/nav_label_rimdroid"/>
+                    android:text="@string/nav_wiki"/>
             </LinearLayout>
 
             <LinearLayout
@@ -182,20 +180,19 @@
                 android:orientation="vertical">
 
                 <ImageButton
-                    android:id="@+id/link_zomdroid"
+                    android:id="@+id/link_rimdroid"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:layout_gravity="center_horizontal"
-                    android:padding="9dp"
                     android:scaleType="centerInside"
-                    android:background="@drawable/bg_circle_zomdroid"
-                    android:src="@drawable/ic_zomdroid"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_rimdroid"
                     android:tint="?attr/colorOnSurfaceVariant"
-                    android:contentDescription="@string/nav_label_zomdroid"/>
+                    android:contentDescription="@string/nav_label_rimdroid"/>
 
                 <TextView
                     style="@style/AppTheme.NavBottomLabel"
-                    android:text="@string/nav_label_zomdroid"/>
+                    android:text="@string/nav_label_rimdroid"/>
             </LinearLayout>
         </LinearLayout>
 

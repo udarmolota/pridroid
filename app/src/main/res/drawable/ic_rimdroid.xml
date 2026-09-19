@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- RimDroid's sheriff badge, redrawn as a single-weight outline so it tints with the rest of the
+     drawer's link icons instead of sitting among them as the one full-colour bitmap. The colour
+     PNG it replaces carried a ring, a green star and a small robot; at the ~28dp this renders at,
+     three elements turn to mush, so the silhouette keeps the two that identify it: the ring and
+     the five-point badge with balled tips. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M 1.9,12 a 10.1,10.1 0 1 0 20.2,0 a 10.1,10.1 0 1 0 -20.2,0 Z" />
+
+    <!-- Five-point star, point up -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M 12,5.9 L 13.66,9.68 L 17.78,10.10 L 14.70,12.87 L 15.56,16.92 L 12,14.84 L 8.44,16.92 L 9.30,12.87 L 6.22,10.10 L 10.34,9.68 Z" />
+
+    <!-- Balled tips: what makes it a sheriff's badge rather than a plain star -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 12,4.6 m -1.15,0 a 1.15,1.15 0 1 0 2.3,0 a 1.15,1.15 0 1 0 -2.3,0 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 18.95,9.66 m -1.15,0 a 1.15,1.15 0 1 0 2.3,0 a 1.15,1.15 0 1 0 -2.3,0 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 16.30,17.82 m -1.15,0 a 1.15,1.15 0 1 0 2.3,0 a 1.15,1.15 0 1 0 -2.3,0 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 7.70,17.82 m -1.15,0 a 1.15,1.15 0 1 0 2.3,0 a 1.15,1.15 0 1 0 -2.3,0 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 5.05,9.66 m -1.15,0 a 1.15,1.15 0 1 0 2.3,0 a 1.15,1.15 0 1 0 -2.3,0 Z" />
+</vector>

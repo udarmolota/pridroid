@@ -18,7 +18,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * Extracts RimWorld from GOG.com DRM-free Linux installers — the {@code .sh} files distributed
+ * Extracts Prison Architect from GOG.com DRM-free Linux installers — the {@code .sh} files distributed
  * directly (and widely re-shared). Each installer is a Makeself 2.2.0 self-extracting archive
  * (shell header + a MojoSetup runtime), with the actual game data appended as a plain ZIP whose
  * entries live under {@code data/noarch/game/}. Because a ZIP is located from its end-of-central-
@@ -27,8 +27,8 @@ import java.util.zip.ZipInputStream;
  *
  * <p>Input may be a single {@code .sh}, or a {@code .zip} bundling the base game + DLC installers
  * (the common "full pack" layout). We extract every installer's {@code data/noarch/game/} subtree,
- * stripping that prefix, into one instance dir: the base game contributes {@code RimWorldLinux} +
- * {@code Data/Core}; each DLC merges its {@code Data/<Expansion>} folder — exactly RimWorld's own
+ * stripping that prefix, into one instance dir: the base game contributes the game binary +
+ * its data archives; each DLC merges its own files — exactly the layout the game
  * expansion layout. The result is the same tree {@link InstallerService} already handles, so the
  * normal configure / save-fix tail runs unchanged.
  */
@@ -44,14 +44,14 @@ public final class GogInstallerExtractor {
 
     /**
      * Cheap content sniff: is {@code file} a GOG installer, or a {@code .zip} bundling GOG
-     * installers? Returns false for our normal RimWorld zips (which contain RimWorldLinux directly)
+     * installers? Returns false for a normal game zip (which contains the game binary directly)
      * so the caller keeps using the plain-zip path for those.
      */
     public static boolean looksLikeGogBundle(File file) {
         if (file == null || !file.isFile()) return false;
         // A single makeself/GOG .sh: shell shebang + a Makeself/mojosetup marker in the header.
         if (isMakeselfInstaller(file)) return true;
-        // A .zip bundling .sh installers: contains *.sh entries and NOT RimWorldLinux itself.
+        // A .zip bundling .sh installers: contains *.sh entries and NOT the game binary itself.
         if (isZip(file)) {
             try (java.util.zip.ZipFile zf = new java.util.zip.ZipFile(file)) {
                 boolean hasSh = false, hasBin = false;
@@ -111,7 +111,7 @@ public final class GogInstallerExtractor {
             if (installers.isEmpty())
                 throw new IOException("No .sh installers found in " + source.getName());
 
-            // Base game (the one carrying RimWorldLinux) first, so its root files land before DLC.
+            // Base game (the one carrying the game binary) first, so its root files land before DLC.
             installers.sort((a, b) -> Boolean.compare(!installerHasBinary(a), !installerHasBinary(b)));
 
             int n = 0;
@@ -188,7 +188,7 @@ public final class GogInstallerExtractor {
         return null;
     }
 
-    /** True if this installer's payload contains the RimWorldLinux binary (i.e. it's the base game). */
+    /** True if this installer's payload contains the game binary (i.e. it's the base game). */
     private static boolean installerHasBinary(File installer) {
         try (ZipFile zf = new ZipFile(installer)) {
             Enumeration<ZipArchiveEntry> en = zf.getEntries();

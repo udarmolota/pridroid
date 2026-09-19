@@ -17,9 +17,14 @@
             android:title="@string/nav_install_content" />
     </group>
 
-    <!-- 2) Anonymous Prison Architect Workshop downloader. Game/DLC Steam downloads and Steam
-         Cloud stay hidden: PriDroid uses the user's DRM-free game install and local saves. -->
+    <!-- 2) Getting content onto the phone: the player's own GOG library, and the anonymous Prison
+         Architect Workshop downloader. Steam game/DLC downloads and Steam Cloud stay hidden:
+         PriDroid uses the user's DRM-free game install and local saves. -->
     <group android:id="@+id/group_steam" android:checkableBehavior="none">
+        <item
+            android:id="@+id/action_gog_login"
+            android:icon="@drawable/ic_gog"
+            android:title="@string/nav_gog_login" />
         <item
             android:id="@+id/action_download_mods"
             android:icon="@drawable/mt_icon_mods"
