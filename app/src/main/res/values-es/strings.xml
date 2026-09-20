@@ -9,7 +9,7 @@
     <string name="no_instances">No hay instancias instaladas</string>
     <!-- Getting-started card on the launcher screen, shown while no instance exists yet. -->
     <string name="launcher_empty_title">Cómo empezar</string>
-    <string name="launcher_empty_guide">PriDroid ejecuta la versión de Linux de Prison Architect: el juego no está incluido. Se vende en tiendas como GOG. Si tu copia está allí, inicia sesión para descargarla aquí mismo; en los demás casos, copia el instalador o el archivo de Linux al dispositivo y eliégelo en «Add game instance». La guía de inicio rápido explica ambas opciones.</string>
+    <string name="launcher_empty_guide">PriDroid ejecuta la versión de Linux de Prison Architect: el juego no está incluido. Se vende en tiendas como GOG. Si tu copia está allí, inicia sesión para descargarla aquí mismo; en los demás casos, copia el instalador o el archivo de Linux al dispositivo y eliégelo en «Añadir instancia del juego». La guía de inicio rápido explica ambas opciones.</string>
     <string name="launcher_empty_gog">Descargar desde GOG</string>
     <string name="launcher_empty_quick_start">Guía de inicio rápido</string>
     <string name="choose_instance_prompt">— Elige una instancia —</string>
@@ -95,6 +95,7 @@ En la nube: %2$s
     <string name="driver_recommend_result">GPU: %1$s → %2$s</string>
     <string name="driver_auto_set_title">Controlador recomendado aplicado</string>
     <string name="driver_auto_set">GPU detectada: %1$s.\n\nSe aplicó el controlador Vulkan recomendado para esta instancia: %2$s.\n\nSi ves una pantalla negra o artefactos, cámbialo en los ajustes de la instancia (el icono de engranaje en su tarjeta).</string>
+    <string name="nav_download_mods">Mods del Workshop</string>
     <string name="nav_import_mods">Importar mods (ZIP)</string>
     <string name="nav_export_saves">Exportar partidas</string>
     <string name="nav_import_saves">Importar partidas</string>
