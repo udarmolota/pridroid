@@ -42,14 +42,11 @@ public class PriDroidApplication extends Application {
         // Apply the user's theme choice (System / Light / Dark) before any activity is shown.
         androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
                 LauncherPreferences.requireSingleton().getThemeMode());
-        // Load native libraries built by CMake — ONLY in the main process. The ":fmoddec"
-        // process (the offline FMOD audio decoder) must NOT load libpridroidlinker, because it
-        // interposes dlopen process-wide and loads normal arm64 libs (libfmod) into box64's
-        // namespace, crashing them. In :fmoddec, dlopen stays the real bionic one. See
-        // FmodDecodeService / [[audio_fmod_plan]].
+        // Load the native libraries built by CMake. libpridroidlinker interposes dlopen
+        // process-wide, so it must only ever be loaded where box64 runs: the app has no
+        // secondary process any more, but the guard stays cheap insurance if one returns.
         String proc = getProcessName();
-        boolean mainProcess = (proc == null) || proc.equals(getPackageName());
-        if (mainProcess) {
+        if (proc == null || proc.equals(getPackageName())) {
             System.loadLibrary("pridroid");
             System.loadLibrary("pridroidlinker");
         } else {
