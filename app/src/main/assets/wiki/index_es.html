@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki</title>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            body {
+                color: #E2E2E9;
+            }
+
+            a {
+                color: #8AB4F8;
+            }
+        }
+
+        details > summary {
+            font-style: italic;
+        }
+
+        p + details,
+        div + details,
+        body > details {
+            margin-top: 1em;
+        }
+
+        .details-content {
+            padding-top: 0.5em;
+        }
+
+        code {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        li {
+            margin-bottom: 0.3em;
+        }
+    </style>
+</head>
+<body>
+<ul>
+    <li><a href="#quick-start">Inicio rápido</a></li>
+    <li>
+        <a href="#get-game">Cómo conseguir el juego</a>
+        <ol>
+            <li><a href="#gog">Desde GOG, dentro de la app</a></li>
+            <li><a href="#zip-archive">Desde un archivo que ya tienes</a></li>
+            <li><a href="#steam">¿Y Steam?</a></li>
+        </ol>
+    </li>
+    <li><a href="#dlc">DLC</a></li>
+    <li><a href="#mods">Mods</a></li>
+    <li><a href="#renderers">Renderizadores y controladores</a></li>
+    <li><a href="#picture">Imagen, tamaño del texto y fluidez</a></li>
+    <li><a href="#controls">Controles</a></li>
+    <li><a href="#saves">Partidas y ajustes</a></li>
+    <li><a href="#compat-mode">Modo de compatibilidad</a></li>
+    <li><a href="#performance">Cómo obtener el mejor rendimiento</a></li>
+    <li><a href="#known-issues">Problemas conocidos</a></li>
+    <li><a href="#report">Cómo reportar un problema</a></li>
+</ul>
+
+<hr>
+
+<section id="quick-start">
+    <h2>Inicio rápido</h2>
+    <p>
+        PriDroid es un lanzador: ejecuta <b>tu propia copia</b> de Prison Architect en Android. El
+        juego en sí no está incluido, y nunca lo estará.
+    </p>
+    <ol>
+        <li>Lo que necesitas es la versión de <b>Linux</b> del juego &mdash; la que GOG, por ejemplo,
+            entrega como un instalador <code>.sh</code>.</li>
+        <li>Lleva el juego a la app. La forma más fácil: menú lateral &rarr; <b>Iniciar sesión en
+            GOG</b>, luego <b>Consultar biblioteca</b> y descárgalo ahí mismo, en el teléfono. Mira
+            <a href="#get-game">Cómo conseguir el juego</a> para ver las otras formas.</li>
+        <li>Una <b>instancia</b> es una copia instalada del juego. Cada una tiene su propia tarjeta
+            en la pantalla principal y sus propios ajustes detrás del <b>icono de engranaje</b>.
+            Puedes tener varias.</li>
+        <li>Toca el botón <b>Iniciar</b> de la tarjeta. El primer arranque es más lento mientras el
+            juego prepara sus archivos; después llega al menú principal en segundos.</li>
+    </ol>
+    <p>
+        Necesitas Android 11 o posterior, un teléfono de 64 bits y alrededor de <b>6 GB de RAM</b>.
+        Deja espacio para el juego y sus archivos convertidos &mdash; más o menos <b>el doble del
+        tamaño del instalador</b>.
+    </p>
+    <p>
+        <b>Si el juego no inicia en absoluto</b>, no empieces a cambiar cosas al azar: ve a
+        <a href="#renderers">Renderizadores y controladores</a> y después a
+        <a href="#compat-mode">Modo de compatibilidad</a>, en ese orden. Esos dos ajustes resuelven
+        la mayoría de los problemas del primer arranque.
+    </p>
+</section>
+
+<section id="get-game">
+    <h2>Cómo conseguir el juego</h2>
+
+    <h3 id="gog">1. Desde GOG, dentro de la app</h3>
+    <p>
+        Menú lateral &rarr; <b>Iniciar sesión en GOG</b>. Escribes tu correo y tu contraseña en la
+        página del propio GOG &mdash; PriDroid nunca los ve. Luego toca <b>Consultar biblioteca</b>:
+        la app recorre tu cuenta, encuentra Prison Architect y lo muestra junto con los DLC que
+        tengas.
+    </p>
+    <p>
+        Toca <b>Descargar</b> en el juego. Los archivos llegan a la carpeta pública
+        <code>Download/PriDroid</code>, que necesita el "acceso a todos los archivos" &mdash;
+        Android te lo va a pedir, y la app no puede escribir ahí hasta que lo concedas. Puedes salir
+        de la app mientras descarga.
+    </p>
+    <p>
+        Cuando termina, el botón cambia a <b>Crear una instancia</b>. Tócalo y se abre la pantalla de
+        la instancia con el archivo ya elegido &mdash; y si también descargaste DLC, se instalan en
+        el mismo paso.
+    </p>
+    <details>
+        <summary>Iniciar sesión con Google o Facebook no funciona aquí</summary>
+        <div class="details-content">
+            El acceso mediante una cuenta vinculada no se puede completar dentro de una app. Si así
+            es como sueles entrar a GOG, establece antes una contraseña: gog.com &rarr; Iniciar
+            sesión &rarr; Restablecer contraseña. Después de eso, el inicio de sesión dentro de la
+            app funciona.
+        </div>
+    </details>
+
+    <h3 id="zip-archive">2. Desde un archivo que ya tienes</h3>
+    <p>
+        Si descargaste el instalador en la PC, cópialo al teléfono y usa menú lateral &rarr;
+        <b>Añadir instancia del juego</b>. PriDroid acepta directamente el instalador <code>.sh</code>
+        de GOG, y también un <code>.zip</code> que contenga uno (el juego base más los instaladores
+        de los DLC en un solo zip funciona &mdash; se descomprimen en una misma instancia).
+    </p>
+    <p>
+        La mayoría de los exploradores de archivos se niegan a entregarle un <code>.sh</code> suelto
+        a una app. Si el selector no muestra tu archivo, ponlo primero en un <code>.zip</code>.
+    </p>
+
+    <h3 id="steam">3. ¿Y Steam?</h3>
+    <p>
+        La versión de Steam <b>no es compatible</b>. Se niega a ejecutarse sin el cliente de Steam, y
+        hacerla funcionar fuera de Steam necesita una capa que verifique que el juego es tuyo
+        &mdash; trabajo de verdad, que preferimos hacer bien antes que fingir. Está en los planes.
+        Por ahora usa la versión de Linux, que está pensada para funcionar por su cuenta.
+    </p>
+</section>
+
+<section id="dlc">
+    <h2>DLC</h2>
+    <p>
+        Los DLC se instalan en una instancia que ya existe. Si los descargaste desde GOG dentro de la
+        app, el botón <b>Instalar</b> de la tarjeta del DLC te lleva directo ahí. Si no: menú lateral
+        &rarr; <b>Instalar mod / DLC</b>, elige la instancia, abre la pestaña <b>DLC</b>, elige el
+        archivo, Instalar.
+    </p>
+    <p>
+        Una vez instalado, las funciones de un DLC se activan donde el juego las espera &mdash; en
+        los <b>ajustes de la prisión nueva</b>, dentro de <b>Extra settings</b> (ajustes
+        adicionales). Gangs, por ejemplo, es una lista desplegable de ahí.
+    </p>
+    <details>
+        <summary>¿Por qué tengo que marcar un DLC otra vez en cada prisión nueva?</summary>
+        <div class="details-content">
+            El juego comprueba si tienes un DLC leyendo archivos de titularidad y, bajo emulación,
+            nunca los lee, así que da todo por no adquirido y olvida tu última elección cuando se
+            abre la ventana de prisión nueva. El DLC en sí funciona perfectamente &mdash; solo
+            tienes que volver a elegir su modo cada vez que empiezas una prisión nueva. Las
+            prisiones que ya creaste conservan sus ajustes.
+        </div>
+    </details>
+</section>
+
+<section id="mods">
+    <h2>Mods</h2>
+    <p>
+        Los mods gratuitos del Steam Workshop se pueden descargar desde dentro de PriDroid, sin
+        cuenta de Steam y sin iniciar sesión: menú lateral &rarr; <b>Workshop mods</b> (mods del
+        Workshop).
+    </p>
+    <p>
+        Escribe el <b>ID</b> del mod &mdash; el número al final de su dirección en el Workshop,
+        <code>&hellip;/sharedfiles/filedetails/?id=<b>1234567890</b></code>. Se pueden escribir
+        varios ID a la vez, separados por espacios. También hay un botón que abre un ID en el
+        navegador, para que compruebes que es el mod correcto antes de descargarlo.
+    </p>
+    <p>
+        Descargar e instalar son dos pasos. Cada mod se guarda como un <code>.zip</code> en la
+        carpeta pública <code>Download/PriDroid</code>, donde puedes verlo y conservarlo. Para
+        meterlo en un juego, usa <b>Instalar mod / DLC</b> &mdash; hay un botón en la pantalla de
+        descarga que te lleva directo ahí &mdash;, elige la instancia, quédate en la pestaña
+        <b>MODS</b>, elige el zip, Instalar. Un mod que ya tengas como <code>.zip</code> se instala
+        igual.
+    </p>
+    <p>
+        Los mods se activan en el propio juego, en la pantalla <b>Mods</b> del menú principal.
+    </p>
+    <details>
+        <summary>Los mods pueden cambiar lo que ves en el menú principal</summary>
+        <div class="details-content">
+            Algunos mods traen sus propias prisiones de muestra. El menú principal del juego carga
+            una detrás del menú, como fondo, así que después de instalar un mod así el menú puede
+            tardar mucho más en aparecer e ir lento mientras estás en él. Eso es el contenido del
+            mod, que se está simulando, no un fallo del lanzador.
+        </div>
+    </details>
+</section>
+
+<section id="renderers">
+    <h2>Renderizadores y controladores</h2>
+    <p>
+        Prison Architect dibuja con OpenGL a la antigua, que Android no tiene. PriDroid lo traduce, y
+        hay dos maneras de hacerlo. Si el juego se cierra o muestra una pantalla negra antes de que
+        veas un solo fotograma, <b>esto es lo primero que hay que cambiar</b>:
+        <b>icono de engranaje &rarr; Vídeo &rarr; Renderizador</b>. Se aplica en el siguiente
+        arranque.
+    </p>
+
+    <h3>Zink (Vulkan)</h3>
+    <p>
+        El predeterminado, y el más rápido de los dos. Convierte el OpenGL del juego en Vulkan, así
+        que necesita un controlador Vulkan sano. En GPU <b>Adreno</b> (Qualcomm Snapdragon) este es
+        el camino probado.
+    </p>
+
+    <h3>NG-GL4ES (sin Vulkan)</h3>
+    <p>
+        Convierte el OpenGL del juego en OpenGL ES, que tiene cualquier teléfono Android. No toca
+        Vulkan para nada, así que es la respuesta cuando Zink se cae &mdash; normalmente en GPU
+        <b>Mali</b> y otras que no son Adreno.
+    </p>
+
+    <h3>Controladores Vulkan (para Zink)</h3>
+    <p>
+        Con Zink también puedes elegir qué controlador Vulkan usa: <b>icono de engranaje &rarr;
+        Vídeo &rarr; Controlador Vulkan</b>. La app te recomienda uno para tu GPU. Los controladores
+        Turnip incluidos son para Adreno; <b>System</b> (sistema) significa el controlador propio de
+        tu teléfono. Si tienes tu propio archivo de controlador, menú lateral &rarr; <b>Controlador
+        Vulkan personalizado</b> lo importa.
+    </p>
+    <p>
+        Cambiar el controlador solo importa para Zink. NG-GL4ES lo ignora.
+    </p>
+</section>
+
+<section id="picture">
+    <h2>Imagen, tamaño del texto y fluidez</h2>
+    <p>
+        Prison Architect se hizo para un monitor, así que su interfaz empieza siendo muy pequeña en
+        un teléfono. Aquí hay dos ajustes que trabajan juntos, y usar solo uno de ellos es lo que
+        deja a la gente descontenta:
+    </p>
+    <ul>
+        <li><b>Resolución de renderizado</b> (icono de engranaje &rarr; Vídeo) &mdash; cuántos
+            píxeles dibuja el juego. Menos es más rápido y hace todo más grande, pero borroso.</li>
+        <li><b>Escala de la interfaz</b> (icono de engranaje) &mdash; el tamaño de la interfaz del
+            propio juego, que el juego nunca te deja cambiar. PriDroid lo escribe por ti.</li>
+    </ul>
+    <p>
+        <b>Sube las dos en la misma proporción y la interfaz conserva su tamaño, pero se ve más
+        nítida.</b> Pasar de 1280&times;800 a 2560&times;1600 y al mismo tiempo mover la escala de
+        1&times; a 2&times; deja el texto del mismo tamaño que antes y con el doble de detalle.
+        Subir solo la resolución hace que todo quede diminuto; bajarla sola lo deja borroso.
+    </p>
+    <p>
+        Más resolución cuesta tiempo de GPU, así que en un teléfono más débil busca un punto medio
+        &mdash; una escala de 1.5&times; con una resolución intermedia suele ser el mejor
+        equilibrio.
+    </p>
+    <p>
+        En <b>Fluidez</b> vas a encontrar un <b>contador de FPS</b> en pantalla y un <b>límite de
+        FPS</b>. Limitarlo a 30 o 60 puede hacer que el teléfono funcione más fresco y más parejo
+        que si lo dejas correr a tope.
+    </p>
+</section>
+
+<section id="controls">
+    <h2>Controles</h2>
+
+    <h3>Toque</h3>
+    <p>
+        Tocar = clic izquierdo. Mantener sin mover = clic derecho. Dos dedos = pellizcar para hacer
+        zoom. Arrastrar con un dedo mueve el mapa, si lo activas en los ajustes.
+    </p>
+
+    <h3>Controles en pantalla</h3>
+    <p>
+        Los botones que van sobre el juego son totalmente editables: icono de engranaje &rarr;
+        <b>Controles</b> &rarr; <b>Editar controles en pantalla</b>. Puedes mover y redimensionar
+        cada botón, cambiar su opacidad, añadir nuevos y asignar cualquiera de ellos a una tecla del
+        teclado o a una acción del mouse. Los diseños se pueden exportar e importar desde el menú
+        lateral, así que puedes conservar uno y compartirlo.
+    </p>
+
+    <h3>Escribir texto</h3>
+    <p>
+        Para los campos que piden texto &mdash; nombres de prisiones, cuadros de búsqueda &mdash;
+        usa el botón de teclado en pantalla que está entre los controles superpuestos.
+    </p>
+
+    <h3>Control (gamepad)</h3>
+    <p>
+        Un control conectado se puede asignar a teclas y acciones del mouse: icono de engranaje
+        &rarr; <b>Controles</b> &rarr; el botón Asignación del control. Prison Architect no tiene
+        soporte real de control propio, así que esto es una reasignación, no juego nativo con
+        control.
+    </p>
+</section>
+
+<section id="saves">
+    <h2>Partidas y ajustes</h2>
+    <p>
+        Las partidas viven dentro de la instancia y se quedan ahí cuando actualizas la app. Desde el
+        menú lateral puedes <b>exportar</b> e <b>importar</b> partidas, ajustes y el diseño de
+        controles como archivos <code>.zip</code> &mdash; útil para pasar a otro teléfono o para
+        tener una copia de seguridad antes de experimentar.
+    </p>
+    <p>
+        <b>Una advertencia.</b> Android borra los datos de una app cuando se instala con una clave
+        de firma distinta. Si cambias entre compilaciones de distintas fuentes, todo &mdash;
+        instancias y partidas incluidas &mdash; se borra. Exporta primero.
+    </p>
+</section>
+
+<section id="compat-mode">
+    <h2>Modo de compatibilidad</h2>
+    <p>
+        <b>Icono de engranaje &rarr; Avanzado &rarr; Modo de compatibilidad.</b> Cambia la forma en
+        que el emulador traduce el código del juego a instrucciones que tu teléfono entiende.
+        Algunos dispositivos lo necesitan para siquiera pasar de la pantalla de carga.
+    </p>
+    <p>
+        Es un poco más lento, así que déjalo <b>desactivado</b> mientras el juego funcione con
+        normalidad. Actívalo si el juego no inicia y cambiar el renderizador no ayudó.
+    </p>
+</section>
+
+<section id="performance">
+    <h2>Cómo obtener el mejor rendimiento</h2>
+    <ul>
+        <li><b>Activa el potenciador de juegos de tu teléfono</b> y ponlo en su perfil de máximo
+            rendimiento. Casi todos los teléfonos tienen uno &mdash; Samsung <i>Game Booster</i>,
+            Xiaomi/POCO <i>Game Turbo</i>, OPPO/OnePlus <i>Game Space</i>, vivo <i>Ultra Game
+            Mode</i>. Asegúrate de que el perfil no sea el "equilibrado" ni un ahorro de
+            batería.</li>
+        <li><b>Mantén la prisión modesta en un teléfono más débil.</b> El costo crece con lo que
+            está pasando dentro de ella: una prisión joven es ligera, una grande con cientos de
+            presos no lo es. Este es un límite de CPU, no de gráficos, así que bajar la resolución
+            no va a arreglar una simulación lenta.</li>
+        <li><b>Limita los FPS</b> (icono de engranaje &rarr; Fluidez). Unos 30 estables suelen
+            sentirse mejor que 45 irregulares y mantienen el teléfono más fresco.</li>
+        <li><b>Cierra las apps en segundo plano</b> para que el juego tenga la memoria y la CPU para
+            él solo.</li>
+    </ul>
+</section>
+
+<section id="known-issues">
+    <h2>Problemas conocidos</h2>
+
+    <h3>El menú principal muestra una prisión que se construye sola</h3>
+    <p>
+        Es así a propósito. El juego insiste en mostrar una prisión detrás de su menú principal;
+        normalmente carga una de sus grandes prisiones de muestra, lo que en un teléfono tarda
+        minutos y va lentísimo. PriDroid le da en su lugar un mapa pequeño recién generado, así que
+        el menú aparece en segundos. El efecto secundario es que el explorador de "Premade prisons"
+        (prisiones prediseñadas) del juego queda vacío.
+    </p>
+
+    <h3>Hay que activar los DLC en cada prisión nueva</h3>
+    <p>
+        Mira <a href="#dlc">DLC</a> &mdash; bajo emulación el juego no puede ver sus archivos de
+        titularidad. El DLC funciona; lo único que se pierde es la opción recordada.
+    </p>
+
+    <h3>El juego se cierra antes de mostrar nada</h3>
+    <p>
+        Prueba primero el otro <a href="#renderers">renderizador</a> y luego el
+        <a href="#compat-mode">Modo de compatibilidad</a>. Si ninguno ayuda, manda un reporte
+        &mdash; un cierre tan temprano suele ser algo que podemos nombrar con exactitud a partir del
+        registro.
+    </p>
+
+    <h3>Versiones antiguas del juego</h3>
+    <p>
+        PriDroid se desarrolla contra la versión actual del juego. Las versiones mucho más viejas
+        arrastran errores que se corrigieron hace años y pueden comportarse de otra forma. Si tu
+        copia tiene años, vale la pena actualizarla antes que nada.
+    </p>
+</section>
+
+<section id="report">
+    <h2>Cómo reportar un problema</h2>
+    <p>
+        Menú lateral &rarr; <b>Reportar un error</b>. Recopila el registro del lanzador, el del
+        emulador, el registro propio del juego, tus ajustes y la constancia que el sistema guarda de
+        cómo terminó la app, y lo empaqueta todo en un <code>.zip</code> que puedes adjuntar a un
+        correo.
+    </p>
+    <p>
+        Lo que hace útil un reporte:
+    </p>
+    <ul>
+        <li><b>Mándalo justo después de que ocurra el problema</b>, antes de volver a iniciar
+            &mdash; los registros solo conservan los arranques más recientes.</li>
+        <li><b>Cambia una cosa a la vez.</b> Si activas tres ajustes de golpe y funciona, nadie se
+            entera de cuál era el que importaba.</li>
+        <li><b>Cuenta qué hiciste y qué esperabas.</b> "Pantalla negra después de tocar Iniciar, el
+            sonido funcionaba" vale más que un zip a secas.</li>
+        <li>Activa el <b>Modo de depuración</b> (icono de engranaje &rarr; Avanzado) antes de
+            reproducir un problema de arranque. Añade detalle a los registros y no cambia nada
+            más.</li>
+    </ul>
+    <p>
+        Los reportes desde dispositivos que no tenemos son la única forma de que esto mejore. El
+        desarrollo ocurre en dos teléfonos; todo lo que sabemos del resto viene de ti.
+    </p>
+</section>
+</body>
+</html>
