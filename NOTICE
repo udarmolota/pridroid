@@ -39,6 +39,15 @@ box64                  MIT License          Copyright (c) 2020 ptitSeb
 
 liblinkernsbypass      BSD 2-Clause License Copyright (c) 2021 Billy Laws
 
+Winlator                LGPL v2.1 or later  Copyright (c) Bruno Freitas (brunodev85)
+                        and Winlator contributors. https://github.com/brunodev85/winlator
+                        PriDroid's in-app X server comes from Winlator: the Java packages
+                        com/pridroid/{xserver,xconnector,sysvshm} and the native sources in
+                        app/src/main/cpp/xserver (including winlator.h), carried over with
+                        the game's package name and modified for this launcher. They are
+                        distributed here as source under the LGPL, so they can be studied,
+                        changed and rebuilt; see the repository history for what changed.
+
 Mesa (libOSMesa,       MIT License          Copyright (c) The Mesa 3D Graphics
 libzfa / Zink,                              Library contributors
 softpipe, freedreno /
@@ -119,7 +128,9 @@ Attribution License.
 
 ================================================================================
 Full license texts for the above are available from each project's repository.
-The bundled libraries are either permissive or (glibc, libresolv, 7-Zip-JBinding)
-LGPL shared libraries that can be replaced as described above; PriDroid uses GPL
+The bundled libraries are either permissive or (glibc, libresolv, MobileGlues,
+7-Zip-JBinding) LGPL shared libraries that can be replaced as described above.
+The LGPL code that is not a library — Winlator's X server — ships here as source
+in a public repository, which is what that licence asks for. PriDroid uses GPL
 version 3 because Apache-2.0 components are compatible with GPLv3, not GPLv2.
 ================================================================================
