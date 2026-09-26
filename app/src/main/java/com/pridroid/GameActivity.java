@@ -72,19 +72,43 @@ public class GameActivity extends Activity implements SurfaceHolder.Callback {
      *  Keyboard.onKeyEvent with the full Android map; this covers only what layouts use). */
     private static com.pridroid.xserver.XKeycode xKey(int sdlScancode) {
         switch (sdlScancode) {
-            case 26: return com.pridroid.xserver.XKeycode.KEY_W;
+            // The whole alphabet. A layout can put any letter on a button, and a letter missing
+            // from this table returns null, so the X11 KeyPress is never sent — which is also what
+            // carries the keysym the text-input path needs. RimDroid shipped only W/A/S/D/Q/E/C/F
+            // here and buttons bound to H or R silently did nothing (its report 22092026_1046).
             case 4:  return com.pridroid.xserver.XKeycode.KEY_A;
-            case 22: return com.pridroid.xserver.XKeycode.KEY_S;
+            case 5:  return com.pridroid.xserver.XKeycode.KEY_B;
+            case 6:  return com.pridroid.xserver.XKeycode.KEY_C;
             case 7:  return com.pridroid.xserver.XKeycode.KEY_D;
+            case 8:  return com.pridroid.xserver.XKeycode.KEY_E;
+            case 9:  return com.pridroid.xserver.XKeycode.KEY_F;
+            case 10: return com.pridroid.xserver.XKeycode.KEY_G;
+            case 11: return com.pridroid.xserver.XKeycode.KEY_H;
+            case 12: return com.pridroid.xserver.XKeycode.KEY_I;
+            case 13: return com.pridroid.xserver.XKeycode.KEY_J;
+            case 14: return com.pridroid.xserver.XKeycode.KEY_K;
+            case 15: return com.pridroid.xserver.XKeycode.KEY_L;
+            case 16: return com.pridroid.xserver.XKeycode.KEY_M;
+            case 17: return com.pridroid.xserver.XKeycode.KEY_N;
+            case 18: return com.pridroid.xserver.XKeycode.KEY_O;
+            case 19: return com.pridroid.xserver.XKeycode.KEY_P;
             case 20: return com.pridroid.xserver.XKeycode.KEY_Q;
             case 21: return com.pridroid.xserver.XKeycode.KEY_R;
-            case 8:  return com.pridroid.xserver.XKeycode.KEY_E;
-            case 6:  return com.pridroid.xserver.XKeycode.KEY_C;
-            case 9:  return com.pridroid.xserver.XKeycode.KEY_F;
+            case 22: return com.pridroid.xserver.XKeycode.KEY_S;
+            case 23: return com.pridroid.xserver.XKeycode.KEY_T;
+            case 24: return com.pridroid.xserver.XKeycode.KEY_U;
+            case 25: return com.pridroid.xserver.XKeycode.KEY_V;
+            case 26: return com.pridroid.xserver.XKeycode.KEY_W;
+            case 27: return com.pridroid.xserver.XKeycode.KEY_X;
+            case 28: return com.pridroid.xserver.XKeycode.KEY_Y;
+            case 29: return com.pridroid.xserver.XKeycode.KEY_Z;
             case 44: return com.pridroid.xserver.XKeycode.KEY_SPACE;
             case 41: return com.pridroid.xserver.XKeycode.KEY_ESC;
             case 40: return com.pridroid.xserver.XKeycode.KEY_ENTER;
             case 43: return com.pridroid.xserver.XKeycode.KEY_TAB;
+            case 42: return com.pridroid.xserver.XKeycode.KEY_BKSP;
+            case 54: return com.pridroid.xserver.XKeycode.KEY_COMMA;
+            case 55: return com.pridroid.xserver.XKeycode.KEY_PERIOD;
             case 225: return com.pridroid.xserver.XKeycode.KEY_SHIFT_L;
             case 224: return com.pridroid.xserver.XKeycode.KEY_CTRL_L;
             case 30: return com.pridroid.xserver.XKeycode.KEY_1;
